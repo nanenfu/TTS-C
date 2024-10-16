@@ -1,4 +1,0 @@
-onnxruntime==1.19.2
-soundfile==0.12.1
-LangSegment==0.3.5
-g2p-en==2.1.0
