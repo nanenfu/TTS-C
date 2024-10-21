@@ -19,3 +19,5 @@ target_link_libraries(tts_cpp
                         onnxruntime
                         SndFile::sndfile
                     )
+
+file(COPY onnx/ DESTINATION onnx)

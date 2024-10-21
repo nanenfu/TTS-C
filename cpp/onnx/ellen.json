@@ -1,0 +1,11 @@
+{
+    "Folder": "ellen",
+    "Name": "ellen",
+    "Type": "GPT-SoVits",
+    "Rate": 32000,
+    "NumLayers": 24,
+    "EmbeddingDim": 512,
+    "Dict": "BasicDict",
+    "BertPath": "chinese-roberta-wwm-ext-large",
+    "AddBlank": false
+}
