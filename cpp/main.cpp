@@ -4,6 +4,8 @@
 #include <sndfile.h>
 #include "cnpy.h"
 
+#include "text_preprocessor.h"
+
 // Adapted from the Enfu's code
 void save_audio(const std::vector<float>& audio_data, const std::string& file_path, int sample_rate) {
     SF_INFO sfinfo;
@@ -75,8 +77,21 @@ void run_vits_onnx_model(std::string onnx_model_path, std::vector<int64_t> text_
 
 
 int main() {
+    // Run T2S model to generate y
     std::string project_name = "test3";
+    std::string onnx_encoder_path = "onnx/" + project_name + "/" + project_name + "_t2s_encoder.onnx";
+    std::string onnx_fsdec_path = "onnx/" + project_name + "/" + project_name + "_t2s_fsdec.onnx";
+    std::string onnx_sdec_path = "onnx/" + project_name + "/" + project_name + "_t2s_sdec.onnx";
     std::string onnx_model_path = "onnx/" + project_name + "/test3_vits.onnx";
+
+    // Step 1: Use the TextPreprocessor class to get text_seq
+    std::string text = "just the two of us, we can make it if we try";
+    std::string lang = "en";
+    std::string text_split_method = "cut4";
+    TextPreprocessor text_preprocessor;
+    std::vector<std::map<std::string, std::string>> result = text_preprocessor.preprocess(text, lang, text_split_method);
+
+
 
     std::vector<int64_t> text_seq = {60, 13, 75, 80, 27, 12, 80, 88, 13, 90, 13, 75, 1, 91, 58, 61,
                                         10, 64, 63, 42, 61, 55, 80, 55, 49, 91, 58, 80, 74, 22, 3};

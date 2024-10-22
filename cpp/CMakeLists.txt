@@ -22,7 +22,7 @@ FetchContent_MakeAvailable(cnpy)
 # Find libsndfile
 find_package(SndFile REQUIRED)
 
-add_executable(tts_cpp main.cpp)
+add_executable(tts_cpp main.cpp text_preprocessor.cpp)
 
 target_link_libraries(tts_cpp
                     PRIVATE
