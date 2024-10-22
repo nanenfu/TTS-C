@@ -4,8 +4,7 @@
 
 0. Install prerequisites
 ```bash
-brew install cmake
-brew install libsndfile
+brew install cmake libsndfile zlib
 ```
 
 1. Compile the onnxruntime library

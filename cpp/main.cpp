@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <sndfile.h>
+#include "cnpy.h"
 
 // Adapted from the Enfu's code
 void save_audio(const std::vector<float>& audio_data, const std::string& file_path, int sample_rate) {
@@ -22,12 +23,11 @@ void save_audio(const std::vector<float>& audio_data, const std::string& file_pa
 }
 
 // Adapted from the Enfu's code
-void run_vits_onnx_model(std::vector<int64_t> text_seq, std::vector<int64_t> pred_semantic) {
+void run_vits_onnx_model(std::string onnx_model_path, std::vector<int64_t> text_seq, std::vector<int64_t> pred_semantic) {
     Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "test");
     Ort::SessionOptions session_options;
     session_options.SetIntraOpNumThreads(1);
 
-    std::string onnx_model_path = "onnx/test3/test3_vits.onnx";
     Ort::Session session(env, onnx_model_path.c_str(), session_options);
 
     auto memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
@@ -58,7 +58,7 @@ void run_vits_onnx_model(std::vector<int64_t> text_seq, std::vector<int64_t> pre
 
     Ort::Value input_tensor2 = Ort::Value::CreateTensor<int64_t>(
         memory_info, pred_semantic_modifiable.data(), pred_semantic_modifiable.size(), input_dims2.data(), input_dims2.size());
-    
+
     std::vector<const char*> input_names = {input_name1, input_name2};
     std::vector<Ort::Value> inputs;
     inputs.push_back(std::move(input_tensor1));
@@ -75,6 +75,9 @@ void run_vits_onnx_model(std::vector<int64_t> text_seq, std::vector<int64_t> pre
 
 
 int main() {
+    std::string project_name = "test3";
+    std::string onnx_model_path = "onnx/" + project_name + "/test3_vits.onnx";
+
     std::vector<int64_t> text_seq = {60, 13, 75, 80, 27, 12, 80, 88, 13, 90, 13, 75, 1, 91, 58, 61,
                                         10, 64, 63, 42, 61, 55, 80, 55, 49, 91, 58, 80, 74, 22, 3};
 
@@ -83,6 +86,8 @@ int main() {
                                         921, 256, 369, 887, 827, 355, 145, 293, 989, 988, 84, 378, 727, 180, 180, 263, 496,
                                         175, 902, 278, 748, 748, 52, 0};
 
-    run_vits_onnx_model(text_seq, pred_semantic);
+    cnpy::NpyArray arr = cnpy::npy_load("ssl_content.npy");
+
+    run_vits_onnx_model(onnx_model_path, text_seq, pred_semantic);
     return 0;
 }
