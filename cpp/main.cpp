@@ -85,7 +85,7 @@ int main() {
     std::string onnx_model_path = "onnx/" + project_name + "/test3_vits.onnx";
 
     // Step 1: Use the TextPreprocessor class to get text_seq
-    std::string text = "just the two of us, we can make it if we try";
+    std::string text = "\n\n\njust the two of us. we can make it if we try\n\n";
     std::string lang = "en";
     std::string text_split_method = "cut4";
     TextPreprocessor text_preprocessor;

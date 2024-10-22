@@ -25,3 +25,9 @@ cmake ..
 make
 ./tts_cpp
 ```
+
+3. Run tests
+```bash
+cd build
+ctest
+```
