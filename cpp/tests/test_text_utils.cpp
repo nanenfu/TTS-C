@@ -30,13 +30,20 @@ TEST_CASE("get_first_sentence should return the first sentence", "[TextUtils]") 
     REQUIRE(TextUtils::get_first_sentence("sent1。sent2 sent1. sent3 sent3 sent3.") == "sent1");
 }
 
-TEST_CASE("split should split the string by the delimiter", "[TextUtils]") {
+TEST_CASE("split should split the string by the separator", "[TextUtils]") {
     std::vector<std::string> result = TextUtils::split("sent1. sent2. sent3.", '.');
 
     REQUIRE(result.size() == 3);
     REQUIRE(result[0] == "sent1");
     REQUIRE(result[1] == " sent2");
     REQUIRE(result[2] == " sent3");
+
+    // should work with unicode characters as well:
+    result = TextUtils::split("sent1。sent2", U'。');
+
+    REQUIRE(result.size() == 2);
+    REQUIRE(result[0] == "sent1");
+    REQUIRE(result[1] == "sent2");
 }
 
 TEST_CASE("cut4 should split the text into sentences", "[TextUtils]") {
@@ -93,6 +100,13 @@ TEST_CASE("split_by_delimiters should split the string by delimiters", "[TextUti
     REQUIRE(result[0] == "sent1.");
     REQUIRE(result[1] == " sent2!");
     REQUIRE(result[2] == " sent3?");
+
+    // should work with unicode characters as well:
+    result = TextUtils::split_by_delimiters("sent1。sent2！sent3？");
+    REQUIRE(result.size() == 3);
+    REQUIRE(result[0] == "sent1。");
+    REQUIRE(result[1] == "sent2！");
+    REQUIRE(result[2] == "sent3？");
 }
 
 TEST_CASE("join should join the string with separator", "[TextUtils]") {

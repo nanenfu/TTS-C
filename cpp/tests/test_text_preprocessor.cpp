@@ -24,13 +24,28 @@ TEST_CASE("pre_seg_text should add dot in front when first seq is small and firs
 
     std::vector<std::string> result = TextPreprocessor::pre_seg_text(text, lang, text_split_method);
 
-    // display the result
-    for (const auto& txt : result) {
-        std::cout << "\"" << txt << "\"" << std::endl;
-    }
+    std::vector<std::string> expected_result = {
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        " Integer sit amet massa mi.",
+        "\tDonec ac ipsum non lacus dignissim volutpat.",
+        " Mauris sollicitudin est lacus,",
+        "iaculis pretium dolor finibus at? Donec et vestibulum dolor.",
+        " Duis ultricies.",
+        "\tjusto vel nisi posuere feugiat, suspendisse pharetra arcu quis ante vehicula.",
+        "dignissim, pellentesque tincidunt ut nisl ac aliquam, integer dignissim, elit.",
+        "dignissim, pellentesque tincidunt ut nisl ac aliquam, integer dignissim, elit.",
+        "dignissim, pellentesque tincidunt ut nisl ac aliquam, integer dignissim, elit.",
+        "dignissim, pellentesque tincidunt ut nisl ac aliquam, integer dignissim, elit.",
+        "dignissim, pellentesque tincidunt ut nisl ac aliquam, integer dignissim, elit.",
+        "ac ultrices auctor, tortor odio tempor justo, sed hendrerit sapien neque pretium dui.",
+        "\tNunc in enim tellus.",
+        "                   In eleifend sagittis dui id maximus。.",
+        "Duis condimentum risus eu urna porta, sed mattis sem molestie.",
+        "Sed elit nulla, hendrerit sed quam quis, aliquam pharetra sem.",
+        "Maecenas condimentum libero ac nibh tincidunt, consectetur cursus justo hendrerit.",
+        "Phasellus bibendum odio in augue pulvinar, non blandit est ultrices.",
+        " Duis commodo ve lectus nec dignissim."
+    };
 
-    // REQUIRE(result[0] == "Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
-    // REQUIRE(result[1] == " Integer sit amet massa mi.");
-    // REQUIRE(result[2] == "\tDonec ac ipsum non lacus dignissim volutpat.");
-    // REQUIRE(result[3] == " Mauris sollicitudin est lacus,");
+    REQUIRE(result == expected_result);
 }

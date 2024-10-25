@@ -1,6 +1,4 @@
 #include <numeric>
-#include <regex>
-#include <sstream>
 #include <iostream>
 #include <string>
 #include <codecvt>
@@ -9,6 +7,7 @@
 #include "text_utils.h"
 
 const std::vector<char32_t> TextUtils::delimiters = {U'，', U'。', U'？', U'！', U',', U'.', U'?', U'!', U'~', U':', U'：', U'—', U'…'};
+std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> TextUtils::converter;
 
 /**
  * Function to trim leading and trailing characters
@@ -71,17 +70,32 @@ void TextUtils::trim(std::string& str) {
  * Function to split a string by a delimiter
  *
  * @param str The input string
- * @param delimiter The delimiter to split by
+ * @param separator The separator to split by
  *
  * @return A vector of substrings
  */
-std::vector<std::string> TextUtils::split(const std::string& str, const char delimiter) {
-    std::vector<std::string> result;
-    std::stringstream ss(str);
-    std::string token;
+std::vector<std::string> TextUtils::split(const std::string& str, const char separator) {
+    // convert the delimiter to a char32_t
+    char32_t separator32 = static_cast<char32_t>(separator);
+    return split(str, separator32);
+}
 
-    while (std::getline(ss, token, delimiter)) {
-        result.push_back(token);
+std::vector<std::string> TextUtils::split(const std::string& str, const char32_t separator) {
+    std::vector<std::string> result;
+    std::u32string u32_str = converter.from_bytes(str);
+    std::u32string token {U""};
+
+    for (auto c : converter.from_bytes(str)) {
+        if (c == separator) {
+            result.push_back(converter.to_bytes(token));
+            token.clear();
+        } else {
+            token += c;
+        }
+    }
+
+    if (!token.empty()) {
+        result.push_back(converter.to_bytes(token));
     }
 
     return result;
@@ -98,12 +112,11 @@ std::vector<std::string> TextUtils::split(const std::string& str, const char del
  * @return The first sentence
  */
 std::string TextUtils::get_first_sentence(const std::string& text) {
-    // convert the text to a u32string
-    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+    // convert the text to a u32string, since the delimiters could be unicode characters
     std::u32string u32_text = converter.from_bytes(text);
 
     // find the first split character
-    auto first = std::find_first_of(u32_text.begin(), u32_text.end(), TextUtils::delimiters.begin(), TextUtils::delimiters.end());
+    auto first = std::find_first_of(u32_text.begin(), u32_text.end(), delimiters.begin(), delimiters.end());
 
     // substring the text to get the first sentence
     std::u32string first_sentence = u32_text.substr(0, first - u32_text.begin());
@@ -139,13 +152,13 @@ std::string TextUtils::join(const std::string& sep, const std::vector<std::strin
  * @return A vector of sentences
  */
 void TextUtils::cut4(std::string& text) {
-    TextUtils::trim_char(text, '\n');
-    TextUtils::trim_char(text, '.');
+    trim_char(text, '\n');
+    trim_char(text, '.');
 
-    std::vector<std::string> sentences = TextUtils::split(text, '.');
+    std::vector<std::string> sentences = split(text, '.');
 
     // join sentences with the dot
-    text = TextUtils::join("\n", sentences);
+    text = join("\n", sentences);
 }
 
 /**
@@ -193,7 +206,7 @@ bool TextUtils::is_delimiter(const char c) {
 }
 
 bool TextUtils::is_delimiter(const char32_t c) {
-    return std::find(TextUtils::delimiters.begin(), TextUtils::delimiters.end(), c) != TextUtils::delimiters.end();
+    return std::find(delimiters.begin(), delimiters.end(), c) != delimiters.end();
 }
 
 /**
@@ -212,7 +225,7 @@ std::vector<std::string> TextUtils::split_long_sentences(std::vector<std::string
             result.push_back(sentence);
         } else {
             // split sentence into smaller segments by the delimiters
-            std::vector<std::string> segments = TextUtils::split_by_delimiters(sentence);
+            std::vector<std::string> segments = split_by_delimiters(sentence);
             for (const auto& segment : segments) {
                 if (result.empty() || result.back().size() + segment.size() > max_len) {
                     result.push_back(segment);
@@ -261,14 +274,15 @@ bool TextUtils::is_empty(const std::string& str) {
  */
 std::vector<std::string> TextUtils::split_by_delimiters(const std::string& str) {
     std::vector<std::string> result;
-    std::string current_segment;
+    std::u32string current_segment { U"" };
+    std::u32string u32_str = converter.from_bytes(str);
 
-    for (char c : str) {
+    for (auto c : u32_str) {
         current_segment += c;  // Add character to current chunk
 
         // If the current character is a delimiter, add the chunk to the result and reset the chunk
-        if (TextUtils::is_delimiter(c)) {
-            result.push_back(current_segment);
+        if (is_delimiter(c)) {
+            result.push_back(converter.to_bytes(current_segment));
             current_segment.clear();
         }
     }
