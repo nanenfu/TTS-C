@@ -3,14 +3,16 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <codecvt>
+#include <locale>
 
 #include "text_utils.h"
 
-const std::vector<std::string> TextUtils::delimiters = {"，", "。", "？", "！", ",", ".", "?", "!", "~", ":", "：", "—", "…"};
+const std::vector<char32_t> TextUtils::delimiters = {U'，', U'。', U'？', U'！', U',', U'.', U'?', U'!', U'~', U':', U'：', U'—', U'…'};
 
 /**
  * Function to trim leading and trailing characters
- * 
+ *
  * @param str The input string
  * @param c The character to trim
  */
@@ -36,9 +38,9 @@ void TextUtils::trim_char(std::string& str, const char c) {
 
 /**
  * Function to trim leading and trailing whitespace
- * 
+ *
  * @param str The input string
- */ 
+ */
 void TextUtils::trim(std::string& str) {
     // Find the first non-whitespace character from the start
     auto start = str.begin();
@@ -67,10 +69,10 @@ void TextUtils::trim(std::string& str) {
 
 /**
  * Function to split a string by a delimiter
- * 
+ *
  * @param str The input string
  * @param delimiter The delimiter to split by
- * 
+ *
  * @return A vector of substrings
  */
 std::vector<std::string> TextUtils::split(const std::string& str, const char delimiter) {
@@ -89,49 +91,66 @@ std::vector<std::string> TextUtils::split(const std::string& str, const char del
  * Function to get the first sentence from a text
  * The first sentence is defined as the text before the first split character
  * The split characters are defined in the delimiters vector
- * 
+ *
  * @param text The input text
  * @return The first sentence
- * 
+ *
  * @return The first sentence
  */
 std::string TextUtils::get_first_sentence(const std::string& text) {
-    std::string pattern = "[" + std::accumulate(TextUtils::delimiters.begin(), TextUtils::delimiters.end(), std::string("|")) + "]";
-    std::regex re(pattern);
-    std::sregex_token_iterator iter(text.begin(), text.end(), re, -1);
-    std::string first = iter->str();
+    // convert the text to a u32string
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+    std::u32string u32_text = converter.from_bytes(text);
 
-    return first;
+    // find the first split character
+    auto first = std::find_first_of(u32_text.begin(), u32_text.end(), TextUtils::delimiters.begin(), TextUtils::delimiters.end());
+
+    // substring the text to get the first sentence
+    std::u32string first_sentence = u32_text.substr(0, first - u32_text.begin());
+
+    return converter.to_bytes(first_sentence);
 }
 
 /**
- * Function to split the text into sentences
- * 
- * @param text The input text
- * @return A vector of sentences
+ * Function to join strings with a separator
+ * adapted from https://stackoverflow.com/a/71983949/275339
+ *
+ * @param sep The separator
+ * @param strings A vector of strings to join
+ *
+ * @return The joined string
  */
-std::vector<std::string> TextUtils::cut4(const std::string& text) {
-    // copy the text
-    std::string text_copy{text};
-
-    TextUtils::trim_char(text_copy, '\n');
-    TextUtils::trim_char(text_copy, '.');
-    std::vector<std::string> result = TextUtils::split(text_copy, '.');
-
-    for (auto& sentence : result) {
-        TextUtils::trim_char(sentence, '\n');
-        TextUtils::replace_all(sentence, "\n\n", "\n");
+std::string TextUtils::join(const std::string& sep, const std::vector<std::string>& strings) {
+    std::string result;
+    for (const auto& str : strings) {
+        if (!result.empty()) {
+            result += sep;
+        }
+        result += str;
     }
-
-    // filter empty strings
-    result.erase(std::remove_if(result.begin(), result.end(), [](const std::string& s) { return TextUtils::is_empty(s); }), result.end());
 
     return result;
 }
 
 /**
+ * Function to split the text into sentences
+ *
+ * @param text The input text
+ * @return A vector of sentences
+ */
+void TextUtils::cut4(std::string& text) {
+    TextUtils::trim_char(text, '\n');
+    TextUtils::trim_char(text, '.');
+
+    std::vector<std::string> sentences = TextUtils::split(text, '.');
+
+    // join sentences with the dot
+    text = TextUtils::join("\n", sentences);
+}
+
+/**
  * Function to merge short sentences into longer sentences
- * 
+ *
  * @param sentences The input sentences
  * @param threshold The threshold to merge the sentences
  * @return A vector of merged sentences
@@ -163,20 +182,26 @@ std::vector<std::string> TextUtils::merge_short_sentences(std::vector<std::strin
 
 /**
  * Function to check if a character is a split character
- * 
+ *
  * @param c The character to check
  * @return True if the character is a split character, false otherwise
  */
 bool TextUtils::is_delimiter(const char c) {
-    return std::find(TextUtils::delimiters.begin(), TextUtils::delimiters.end(), std::string(1, c)) != TextUtils::delimiters.end();
+    // convert char to char32_t
+    char32_t c32 = static_cast<char32_t>(c);
+    return is_delimiter(c32);
+}
+
+bool TextUtils::is_delimiter(const char32_t c) {
+    return std::find(TextUtils::delimiters.begin(), TextUtils::delimiters.end(), c) != TextUtils::delimiters.end();
 }
 
 /**
  * Function to split a big text into smaller segments
- * 
+ *
  * @param text The input text
  * @param max_len The maximum length of each segment
- * 
+ *
  * @return A vector of smaller segments
  */
 std::vector<std::string> TextUtils::split_long_sentences(std::vector<std::string> sentences, const unsigned int max_len) {
@@ -187,7 +212,14 @@ std::vector<std::string> TextUtils::split_long_sentences(std::vector<std::string
             result.push_back(sentence);
         } else {
             // split sentence into smaller segments by the delimiters
-
+            std::vector<std::string> segments = TextUtils::split_by_delimiters(sentence);
+            for (const auto& segment : segments) {
+                if (result.empty() || result.back().size() + segment.size() > max_len) {
+                    result.push_back(segment);
+                } else {
+                    result.back() += segment;
+                }
+            }
 
         }
     }
@@ -197,14 +229,14 @@ std::vector<std::string> TextUtils::split_long_sentences(std::vector<std::string
 
 /**
  * Function to replace all occurrences of a substring with another substring
- * 
+ *
  * @param str The input string
  * @param from The substring to replace
  * @param to The substring to replace with
- */ 
+ */
 void TextUtils::replace_all(std::string &str, const std::string &toReplace, const std::string &replaceWith) {
     size_t pos = str.find(toReplace);
-    
+
     while (pos != std::string::npos) {
         str.replace(pos, toReplace.length(), replaceWith);
         pos = str.find(toReplace, pos + replaceWith.length());
@@ -213,7 +245,7 @@ void TextUtils::replace_all(std::string &str, const std::string &toReplace, cons
 
 /**
  * Check if a string contains only whitespace characters
- * 
+ *
  * @param str The input string
  */
 bool TextUtils::is_empty(const std::string& str) {
@@ -222,9 +254,9 @@ bool TextUtils::is_empty(const std::string& str) {
 
 /**
  * Function to split a string by delimiters
- * 
+ *
  * @param str The input string
- * 
+ *
  * @return A vector of substrings
  */
 std::vector<std::string> TextUtils::split_by_delimiters(const std::string& str) {

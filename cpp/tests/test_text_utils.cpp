@@ -25,6 +25,9 @@ TEST_CASE("trim should trim spaces from both sides of the string", "[TextUtils]"
 
 TEST_CASE("get_first_sentence should return the first sentence", "[TextUtils]") {
     REQUIRE(TextUtils::get_first_sentence("sent1. sent2 sent1. sent3 sent3 sent3.") == "sent1");
+
+    // should work with unicode characters as well:
+    REQUIRE(TextUtils::get_first_sentence("sent1。sent2 sent1. sent3 sent3 sent3.") == "sent1");
 }
 
 TEST_CASE("split should split the string by the delimiter", "[TextUtils]") {
@@ -37,12 +40,10 @@ TEST_CASE("split should split the string by the delimiter", "[TextUtils]") {
 }
 
 TEST_CASE("cut4 should split the text into sentences", "[TextUtils]") {
-    std::vector<std::string> result = TextUtils::cut4("sent1.   sent2... sent3.");
+    std::string text { "sent1. sent2. sent3." };
+    TextUtils::cut4(text);
 
-    REQUIRE(result.size() == 3);
-    REQUIRE(result[0] == "sent1");
-    REQUIRE(result[1] == "   sent2");
-    REQUIRE(result[2] == " sent3");
+    REQUIRE(text == "sent1\n sent2\n sent3");
 }
 
 TEST_CASE("merge_short_sentences should merge short sentences", "[TextUtils]") {
@@ -55,18 +56,20 @@ TEST_CASE("merge_short_sentences should merge short sentences", "[TextUtils]") {
     REQUIRE(result[2] == "sent5");
 }
 
-TEST_CASE("is_delimiter should return true if the character is in delimiters", "[TextUtils]") {
+TEST_CASE("is_delimiter should return true if the character is a delimiter", "[TextUtils]") {
     REQUIRE(TextUtils::is_delimiter('.') == true);
+    REQUIRE(TextUtils::is_delimiter(U'。') == true);
     REQUIRE(TextUtils::is_delimiter('a') == false);
 }
 
 TEST_CASE("split_long_sentences should split a big text into smaller chunks", "[TextUtils]") {
-    std::vector<std::string> sentences = {"sent1. sent2.", "sent3. sent4.", "sent5. sent6."};
+    std::vector<std::string> sentences = {"sent1. sent2. sent3. sent4.", "sent5. sent6."};
     std::vector<std::string> result = TextUtils::split_long_sentences(sentences, 15);
 
-    REQUIRE(result.size() > 2);
+    REQUIRE(result.size() == 3);
     REQUIRE(result[0] == "sent1. sent2.");
-    REQUIRE(result[1] == "sent3. sent4.");
+    REQUIRE(result[1] == " sent3. sent4.");
+    REQUIRE(result[2] == "sent5. sent6.");
 }
 
 TEST_CASE("replace_all should replace all occurrences of a substring", "[TextUtils]") {
@@ -90,4 +93,11 @@ TEST_CASE("split_by_delimiters should split the string by delimiters", "[TextUti
     REQUIRE(result[0] == "sent1.");
     REQUIRE(result[1] == " sent2!");
     REQUIRE(result[2] == " sent3?");
+}
+
+TEST_CASE("join should join the string with separator", "[TextUtils]") {
+    std::vector<std::string> strings = {"sent1", "sent2", "sent3"};
+    std::string result = TextUtils::join(",", strings);
+
+    REQUIRE(result == "sent1,sent2,sent3");
 }

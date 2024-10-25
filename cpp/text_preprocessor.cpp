@@ -31,20 +31,10 @@ std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const 
     }
 
     // std::cout << "Text: " << text << std::endl;
-    std::vector<std::string> sentences = TextUtils::cut4(text);
+    TextUtils::cut4(text);
+    TextUtils::replace_all(text, "\n\n", "\n");
 
-    // remove \n\n from sentences
-    for (auto& sentence : sentences) {
-        TextUtils::replace_all(sentence, "\n\n", "\n");
-    }
-
-    // display sentences
-    std::cout << "Sentences:" << std::endl;
-    for (const auto& sentence : sentences) {
-        // std::cout << "\"" << sentence << "\"";
-        std::cout << sentence << std::endl;
-    }
-
+    std::vector<std::string> sentences = TextUtils::split(text, '\n');
     sentences = TextUtils::merge_short_sentences(sentences, 5);
 
     // drop empty sentences
