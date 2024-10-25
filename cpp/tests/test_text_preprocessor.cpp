@@ -39,7 +39,7 @@ TEST_CASE("pre_seg_text should add dot in front when first seq is small and firs
         "dignissim, pellentesque tincidunt ut nisl ac aliquam, integer dignissim, elit.",
         "ac ultrices auctor, tortor odio tempor justo, sed hendrerit sapien neque pretium dui.",
         "\tNunc in enim tellus.",
-        "                   In eleifend sagittis dui id maximus。.",
+        "                   In eleifend sagittis dui id maximus。",
         "Duis condimentum risus eu urna porta, sed mattis sem molestie.",
         "Sed elit nulla, hendrerit sed quam quis, aliquam pharetra sem.",
         "Maecenas condimentum libero ac nibh tincidunt, consectetur cursus justo hendrerit.",

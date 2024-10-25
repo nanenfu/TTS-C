@@ -21,7 +21,8 @@ std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const 
     std::string first_sentence = TextUtils::get_first_sentence(text);
     TextUtils::trim(first_sentence);
 
-    if (TextUtils::is_delimiter(text.front()) && first_sentence.size() < 4) {
+    std::u32string first_sentence_u32 = TextUtils::converter.from_bytes(first_sentence);
+    if (TextUtils::is_delimiter(first_sentence_u32.front()) && first_sentence.size() < 4) {
         // then, add a dot in front
         text = (lang == "en") ? "." + text : "。" + text;
     }
@@ -42,7 +43,8 @@ std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const 
 
     // add a dot at the end of the sentence if it is missing
     for (auto& sentence : sentences) {
-        if (!TextUtils::is_delimiter(sentence.back())) {
+        std::u32string sentence_u32 = TextUtils::converter.from_bytes(sentence);
+        if (!TextUtils::is_delimiter(sentence_u32.back())) {
             sentence = sentence + ((lang == "en") ? "." : "。");
         }
     }
