@@ -7,7 +7,12 @@
 #include "text_utils.h"
 
 const std::vector<char32_t> TextUtils::delimiters = {U'，', U'。', U'？', U'！', U',', U'.', U'?', U'!', U'~', U':', U'：', U'—', U'…'};
+
+// discussed in https://stackoverflow.com/a/43153057/275339
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> TextUtils::converter;
+#pragma GCC diagnostic pop
 
 /**
  * Function to trim leading and trailing characters
