@@ -19,6 +19,10 @@ std::vector<std::map<std::string, std::any>> TextPreprocessor::preprocess(const 
     for (auto& text : texts) {
         auto [phones, norm_text] = segment_and_extract_feature_for_text(text, lang);
 
+        if (phones.empty()) {
+            continue;
+        }
+
         std::map<std::string, std::any> text_map;
         text_map["norm_text"] = norm_text;
         text_map["phones"] = phones;
@@ -72,6 +76,9 @@ std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const 
 
 std::tuple<std::vector<unsigned int>, std::string>
 TextPreprocessor::segment_and_extract_feature_for_text(const std::string& text, const std::string& lang) {
+    
+
+
     std::vector<unsigned int> phones;
     std::string norm_text;
 
