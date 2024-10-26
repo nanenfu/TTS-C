@@ -114,4 +114,8 @@ TEST_CASE("join should join the string with separator", "[text_utils]") {
     std::string result = text_utils::join(",", strings);
 
     REQUIRE(result == "sent1,sent2,sent3");
+
+    // should work with empty separator as well:
+    result = text_utils::join("", strings);
+    REQUIRE(result == "sent1sent2sent3");
 }
