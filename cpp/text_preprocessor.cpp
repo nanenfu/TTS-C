@@ -34,16 +34,16 @@ std::vector<std::map<std::string, std::any>> TextPreprocessor::preprocess(const 
 }
 
 std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const std::string& lang, const std::string& text_split_method) {
-    TextUtils::trim_char(text, '\n');
-    // TextUtils::replace_all(text, "...", "…");
+    text_utils::trim_char(text, '\n');
+    // text_utils::replace_all(text, "...", "…");
 
 
     // if the first sentence is too short, add a dot in front
-    std::string first_sentence = TextUtils::get_first_sentence(text);
-    TextUtils::trim(first_sentence);
+    std::string first_sentence = text_utils::get_first_sentence(text);
+    text_utils::trim(first_sentence);
 
-    std::u32string first_sentence_u32 = TextUtils::converter.from_bytes(first_sentence);
-    if (!TextUtils::is_delimiter(first_sentence_u32.front()) && first_sentence_u32.size() < 4) {
+    std::u32string first_sentence_u32 = text_utils::converter.from_bytes(first_sentence);
+    if (!text_utils::is_delimiter(first_sentence_u32.front()) && first_sentence_u32.size() < 4) {
         // then, add a dot in front
         text = (lang == "en") ? "." + text : "。" + text;
     }
@@ -52,24 +52,24 @@ std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const 
         throw std::runtime_error("Only 'cut4' text split method is supported");
     }
 
-    TextUtils::cut4(text);
-    TextUtils::replace_all(text, "\n\n", "\n");
+    text_utils::cut4(text);
+    text_utils::replace_all(text, "\n\n", "\n");
 
-    std::vector<std::string> sentences = TextUtils::split(text, '\n');
-    sentences = TextUtils::merge_short_sentences(sentences, 5);
+    std::vector<std::string> sentences = text_utils::split(text, '\n');
+    sentences = text_utils::merge_short_sentences(sentences, 5);
 
     // drop empty sentences
-    sentences.erase(std::remove_if(sentences.begin(), sentences.end(), [](const std::string& s) { return TextUtils::is_empty(s); }), sentences.end());
+    sentences.erase(std::remove_if(sentences.begin(), sentences.end(), [](const std::string& s) { return text_utils::is_empty(s); }), sentences.end());
 
     // add a dot at the end of the sentence if it is missing
     for (auto& sentence : sentences) {
-        std::u32string sentence_u32 = TextUtils::converter.from_bytes(sentence);
-        if (!TextUtils::is_delimiter(sentence_u32.back())) {
+        std::u32string sentence_u32 = text_utils::converter.from_bytes(sentence);
+        if (!text_utils::is_delimiter(sentence_u32.back())) {
             sentence = sentence + ((lang == "en") ? "." : "。");
         }
     }
 
-    sentences = TextUtils::split_long_sentences(sentences);
+    sentences = text_utils::split_long_sentences(sentences);
 
     return sentences;
 }
