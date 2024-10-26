@@ -87,8 +87,7 @@ std::vector<std::string> TextUtils::split(const std::string& str, const char sep
 
 std::vector<std::string> TextUtils::split(const std::string& str, const char32_t separator) {
     std::vector<std::string> result;
-    std::u32string u32_str = converter.from_bytes(str);
-    std::u32string token {U""};
+    std::u32string token;
 
     for (auto c : converter.from_bytes(str)) {
         if (c == separator) {
@@ -173,12 +172,13 @@ void TextUtils::cut4(std::string& text) {
  * @param threshold The threshold to merge the sentences
  * @return A vector of merged sentences
  */
-std::vector<std::string> TextUtils::merge_short_sentences(std::vector<std::string> sentences, const unsigned int threshold) {
+std::vector<std::string> TextUtils::merge_short_sentences(const std::vector<std::string>& sentences, const unsigned int threshold) {
     std::vector<std::string> result;
 
     // variable to accumulate the text sentences by sentences
     // until the threshold is reached
-    std::string merged_text = "";
+    std::string merged_text;
+
     for (const auto& sentence : sentences) {
         if (!merged_text.empty()) {
             merged_text += " ";
@@ -222,7 +222,7 @@ bool TextUtils::is_delimiter(const char32_t c) {
  *
  * @return A vector of smaller segments
  */
-std::vector<std::string> TextUtils::split_long_sentences(std::vector<std::string> sentences, const unsigned int max_len) {
+std::vector<std::string> TextUtils::split_long_sentences(const std::vector<std::string>& sentences, const unsigned int max_len) {
     std::vector<std::string> result;
 
     for (const auto& sentence : sentences) {
@@ -279,7 +279,7 @@ bool TextUtils::is_empty(const std::string& str) {
  */
 std::vector<std::string> TextUtils::split_by_delimiters(const std::string& str) {
     std::vector<std::string> result;
-    std::u32string current_segment { U"" };
+    std::u32string current_segment;
     std::u32string u32_str = converter.from_bytes(str);
 
     for (auto c : u32_str) {

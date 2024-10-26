@@ -3,6 +3,8 @@
 #include <regex>
 #include <numeric>
 #include <iostream>
+#include <map>
+#include <string>
 
 #include "text_utils.h"
 #include "text_preprocessor.h"
@@ -18,11 +20,13 @@ std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const 
     TextUtils::trim_char(text, '\n');
     // TextUtils::replace_all(text, "...", "…");
 
+
+    // if the first sentence is too short, add a dot in front
     std::string first_sentence = TextUtils::get_first_sentence(text);
     TextUtils::trim(first_sentence);
 
     std::u32string first_sentence_u32 = TextUtils::converter.from_bytes(first_sentence);
-    if (TextUtils::is_delimiter(first_sentence_u32.front()) && first_sentence.size() < 4) {
+    if (!TextUtils::is_delimiter(first_sentence_u32.front()) && first_sentence_u32.size() < 4) {
         // then, add a dot in front
         text = (lang == "en") ? "." + text : "。" + text;
     }
@@ -31,7 +35,6 @@ std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const 
         throw std::runtime_error("Only 'cut4' text split method is supported");
     }
 
-    // std::cout << "Text: " << text << std::endl;
     TextUtils::cut4(text);
     TextUtils::replace_all(text, "\n\n", "\n");
 

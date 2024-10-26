@@ -1,6 +1,9 @@
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 #include <vector>
 #include <iostream>
+#include <utility>
+#include <map>
+#include <string>
 #include <sndfile.h>
 #include "cnpy.h"
 

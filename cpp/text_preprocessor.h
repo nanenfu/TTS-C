@@ -5,7 +5,7 @@
 #include <map>
 
 class TextPreprocessor {
-public:
+ public:
     TextPreprocessor() = default;
 
     static std::vector<std::map<std::string, std::string>> preprocess(const std::string& text,

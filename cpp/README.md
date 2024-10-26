@@ -31,3 +31,10 @@ make
 cd build
 ctest
 ```
+
+## Linter
+
+```bash
+cppcheck -x c++ --enable=all --inconclusive --library=posix text_utils.cpp
+cpplint *.cpp *.h
+```

@@ -48,4 +48,10 @@ TEST_CASE("pre_seg_text should add dot in front when first seq is small and firs
     };
 
     REQUIRE(result == expected_result);
+
+    text = "Hi. Second sentence.";
+    result = TextPreprocessor::pre_seg_text(text, lang, text_split_method);
+    expected_result = { "Hi  Second sentence." };
+
+    REQUIRE(result == expected_result);
 }
