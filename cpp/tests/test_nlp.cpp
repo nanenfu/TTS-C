@@ -3,6 +3,12 @@
 
 #include "nlp.h"
 
-TEST_CASE("test", "[NLP]") {
-    REQUIRE(1 == 1);
+TEST_CASE("seg_text", "[NLP]") {
+    auto [textlist, langlist] = nlp::seg_text("Hello, world!", "en");
+
+    REQUIRE(textlist.size() == 1);
+    REQUIRE(textlist[0] == "Hello, world!");
+
+    REQUIRE(langlist.size() == 1);
+    REQUIRE(langlist[0] == "en");
 }

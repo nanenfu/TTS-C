@@ -9,6 +9,7 @@
 #include <tuple>
 
 #include "text_utils.h"
+#include "nlp.h"
 #include "text_preprocessor.h"
 
 std::vector<std::map<std::string, std::any>> TextPreprocessor::preprocess(const std::string& text, const std::string& lang, const std::string& text_split_method) {
@@ -76,8 +77,11 @@ std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const 
 
 std::tuple<std::vector<unsigned int>, std::string>
 TextPreprocessor::segment_and_extract_feature_for_text(const std::string& text, const std::string& lang) {
-    
+    auto [textlist, langlist] = nlp::seg_text(text, lang);
 
+    if (textlist.empty()) {
+        return std::make_tuple(std::vector<unsigned int>(), "");
+    }
 
     std::vector<unsigned int> phones;
     std::string norm_text;
