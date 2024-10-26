@@ -34,8 +34,10 @@ find_package(SndFile REQUIRED)
 add_executable(tests
                 text_preprocessor.cpp
                 text_utils.cpp
+                nlp.cpp
                 tests/test_text_preprocessor.cpp
                 tests/test_text_utils.cpp
+                tests/test_nlp.cpp
 )
 
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
@@ -51,8 +53,9 @@ catch_discover_tests(tests)
 # Main executable
 add_executable(tts_cpp
                 text_utils.cpp
-                main.cpp
+                nlp.cpp
                 text_preprocessor.cpp
+                main.cpp
 )
 
 target_link_libraries(tts_cpp
