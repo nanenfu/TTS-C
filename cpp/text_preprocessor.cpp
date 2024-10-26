@@ -5,14 +5,27 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <any>
+#include <tuple>
 
 #include "text_utils.h"
 #include "text_preprocessor.h"
 
-std::vector<std::map<std::string, std::string>> TextPreprocessor::preprocess(const std::string& text, const std::string& lang, const std::string& text_split_method) {
+std::vector<std::map<std::string, std::any>> TextPreprocessor::preprocess(const std::string& text, const std::string& lang, const std::string& text_split_method) {
     std::vector<std::string> texts = pre_seg_text(text, lang, text_split_method);
 
-    std::vector<std::map<std::string, std::string>> result;
+    std::vector<std::map<std::string, std::any>> result;
+
+    for (auto& text : texts) {
+        auto [phones, norm_text] = segment_and_extract_feature_for_text(text, lang);
+
+        std::map<std::string, std::any> text_map;
+        text_map["norm_text"] = norm_text;
+        text_map["phones"] = phones;
+
+        result.push_back(text_map);
+    }
+
     return result;
 }
 
@@ -55,4 +68,12 @@ std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const 
     sentences = TextUtils::split_long_sentences(sentences);
 
     return sentences;
+}
+
+std::tuple<std::vector<unsigned int>, std::string>
+TextPreprocessor::segment_and_extract_feature_for_text(const std::string& text, const std::string& lang) {
+    std::vector<unsigned int> phones;
+    std::string norm_text;
+
+    return std::make_tuple(phones, norm_text);
 }

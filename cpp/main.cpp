@@ -92,9 +92,7 @@ int main() {
     std::string lang = "en";
     std::string text_split_method = "cut4";
     TextPreprocessor text_preprocessor;
-    std::vector<std::map<std::string, std::string>> result = text_preprocessor.preprocess(text, lang, text_split_method);
-
-
+    std::vector<std::map<std::string, std::any>> result = text_preprocessor.preprocess(text, lang, text_split_method);
 
     std::vector<int64_t> text_seq = {60, 13, 75, 80, 27, 12, 80, 88, 13, 90, 13, 75, 1, 91, 58, 61,
                                         10, 64, 63, 42, 61, 55, 80, 55, 49, 91, 58, 80, 74, 22, 3};
