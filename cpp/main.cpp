@@ -81,28 +81,28 @@ void run_vits_onnx_model(std::string onnx_model_path, std::vector<int64_t> text_
 
 int main() {
     // Run T2S model to generate y
-    std::string project_name = "test3";
-    std::string onnx_encoder_path = "onnx/" + project_name + "/" + project_name + "_t2s_encoder.onnx";
-    std::string onnx_fsdec_path = "onnx/" + project_name + "/" + project_name + "_t2s_fsdec.onnx";
-    std::string onnx_sdec_path = "onnx/" + project_name + "/" + project_name + "_t2s_sdec.onnx";
-    std::string onnx_model_path = "onnx/" + project_name + "/test3_vits.onnx";
+    const std::string project_name { "test3" };
+    const std::string onnx_encoder_path { "onnx/" + project_name + "/" + project_name + "_t2s_encoder.onnx" };
+    const std::string onnx_fsdec_path { "onnx/" + project_name + "/" + project_name + "_t2s_fsdec.onnx" };
+    const std::string onnx_sdec_path { "onnx/" + project_name + "/" + project_name + "_t2s_sdec.onnx" };
+    const std::string onnx_model_path { "onnx/" + project_name + "/test3_vits.onnx" };
 
     // Step 1: Use the TextPreprocessor class to get text_seq
-    std::string text = "\n\n\njust the two of us. we can make it if we try\n\n";
-    std::string lang = "en";
-    std::string text_split_method = "cut4";
+    const std::string text { "\n\n\njust the two of us. we can make it if we try\n\n" };
+    const std::string lang { "en" };
+    const std::string text_split_method { "cut4" };
     TextPreprocessor text_preprocessor;
     std::vector<std::map<std::string, std::any>> result = text_preprocessor.preprocess(text, lang, text_split_method);
 
-    std::vector<int64_t> text_seq = {60, 13, 75, 80, 27, 12, 80, 88, 13, 90, 13, 75, 1, 91, 58, 61,
+    const std::vector<int64_t> text_seq {60, 13, 75, 80, 27, 12, 80, 88, 13, 90, 13, 75, 1, 91, 58, 61,
                                         10, 64, 63, 42, 61, 55, 80, 55, 49, 91, 58, 80, 74, 22, 3};
 
-    std::vector<int64_t> pred_semantic = {361, 643, 479, 150, 753, 760, 644, 45, 996, 42, 744, 785, 790, 619, 251, 319, 488,
+    const std::vector<int64_t> pred_semantic {361, 643, 479, 150, 753, 760, 644, 45, 996, 42, 744, 785, 790, 619, 251, 319, 488,
                                         783, 127, 660, 331, 637, 32, 528, 934, 303, 740, 9, 908, 837, 325, 201, 55, 385,
                                         921, 256, 369, 887, 827, 355, 145, 293, 989, 988, 84, 378, 727, 180, 180, 263, 496,
                                         175, 902, 278, 748, 748, 52, 0};
 
-    cnpy::NpyArray arr = cnpy::npy_load("ssl_content.npy");
+    const cnpy::NpyArray ssl_content { cnpy::npy_load("ssl_content.npy") };
 
     run_vits_onnx_model(onnx_model_path, text_seq, pred_semantic);
     return 0;

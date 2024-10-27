@@ -165,7 +165,7 @@ namespace text_utils {
      * @param threshold The threshold to merge the sentences
      * @return A vector of merged sentences
      */
-    std::vector<std::string> merge_short_sentences(const std::vector<std::string>& sentences, const unsigned int threshold) {
+    std::vector<std::string> merge_short_sentences(const std::vector<std::string>& sentences, const int threshold) {
         std::vector<std::string> result;
 
         // variable to accumulate the text sentences by sentences
@@ -215,7 +215,7 @@ namespace text_utils {
      *
      * @return A vector of smaller segments
      */
-    std::vector<std::string> split_long_sentences(const std::vector<std::string>& sentences, const unsigned int max_len) {
+    std::vector<std::string> split_long_sentences(const std::vector<std::string>& sentences, const int max_len) {
         std::vector<std::string> result;
 
         for (const auto& sentence : sentences) {

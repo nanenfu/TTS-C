@@ -18,10 +18,10 @@ namespace text_utils {
     std::vector<std::string> split_by_delimiters(const std::string& str);
     std::string get_first_sentence(const std::string& text);
     void cut4(std::string& text);
-    std::vector<std::string> merge_short_sentences(const std::vector<std::string>& sentences, const unsigned int threshold);
-    std::vector<std::string> split_long_sentences(const std::vector<std::string>& sentences, const unsigned int max_len = 510);
+    std::vector<std::string> merge_short_sentences(const std::vector<std::string>& sentences, const int threshold);
+    std::vector<std::string> split_long_sentences(const std::vector<std::string>& sentences, const int max_len = 510);
 
-    static const std::vector<char32_t> delimiters = {U'，', U'。', U'？', U'！', U',', U'.', U'?', U'!', U'~', U':', U'：', U'—', U'…'};
+    static const std::vector<char32_t> delimiters {U'，', U'。', U'？', U'！', U',', U'.', U'?', U'!', U'~', U':', U'：', U'—', U'…'};
 // discussed in https://stackoverflow.com/a/43153057/275339
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"

@@ -75,12 +75,12 @@ std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const 
     return sentences;
 }
 
-std::tuple<std::vector<unsigned int>, std::string>
+std::tuple<std::vector<int>, std::string>
     TextPreprocessor::segment_and_extract_feature_for_text(const std::string& text, const std::string& lang) {
     auto [textlist, langlist] = nlp::seg_text(text, lang);
 
     if (textlist.empty()) {
-        return std::make_tuple(std::vector<unsigned int>(), "");
+        return std::make_tuple(std::vector<int>(), "");
     }
 
     auto [phones, norm_text] = extract_features(textlist, langlist);
@@ -88,9 +88,9 @@ std::tuple<std::vector<unsigned int>, std::string>
     return std::make_tuple(phones, norm_text);
 }
 
-std::tuple<std::vector<unsigned int>, std::string>
+std::tuple<std::vector<int>, std::string>
 TextPreprocessor::extract_features(const std::vector<std::string>& textlist, const std::vector<std::string>& langlist) {
-    std::vector<unsigned int> phones_list;
+    std::vector<int> phones_list;
     std::vector<std::string> norm_text_list;
 
     std::string norm_text = text_utils::join("", textlist);
