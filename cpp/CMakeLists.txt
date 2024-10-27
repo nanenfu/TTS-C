@@ -33,10 +33,10 @@ find_package(SndFile REQUIRED)
 # Tests
 add_executable(tests
                 text_preprocessor.cpp
-                text_utils.cpp
+                string_utils.cpp
                 nlp.cpp
                 tests/test_text_preprocessor.cpp
-                tests/test_text_utils.cpp
+                tests/test_string_utils.cpp
                 tests/test_nlp.cpp
 )
 
@@ -52,7 +52,7 @@ catch_discover_tests(tests)
 
 # Main executable
 add_executable(tts_cpp
-                text_utils.cpp
+                string_utils.cpp
                 nlp.cpp
                 text_preprocessor.cpp
                 main.cpp

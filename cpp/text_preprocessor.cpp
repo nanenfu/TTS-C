@@ -8,7 +8,7 @@
 #include <any>
 #include <tuple>
 
-#include "text_utils.h"
+#include "string_utils.h"
 #include "nlp.h"
 #include "text_preprocessor.h"
 
@@ -35,16 +35,16 @@ std::vector<std::map<std::string, std::any>> TextPreprocessor::preprocess(const 
 }
 
 std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const std::string& lang, const std::string& text_split_method) {
-    text_utils::trim_char(text, '\n');
-    // text_utils::replace_all(text, "...", "…");
+    StringUtils::trim_char(text, '\n');
+    // StringUtils::replace_all(text, "...", "…");
 
 
     // if the first sentence is too short, add a dot in front
-    std::string first_sentence = text_utils::get_first_sentence(text);
-    text_utils::trim(first_sentence);
+    std::string first_sentence = StringUtils::get_first_sentence(text);
+    StringUtils::trim(first_sentence);
 
-    std::u32string first_sentence_u32 = text_utils::converter.from_bytes(first_sentence);
-    if (!text_utils::is_delimiter(first_sentence_u32.front()) && first_sentence_u32.size() < 4) {
+    std::u32string first_sentence_u32 = StringUtils::converter.from_bytes(first_sentence);
+    if (!StringUtils::is_delimiter(first_sentence_u32.front()) && first_sentence_u32.size() < 4) {
         // then, add a dot in front
         text = (lang == "en") ? "." + text : "。" + text;
     }
@@ -53,24 +53,24 @@ std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const 
         throw std::runtime_error("Only 'cut4' text split method is supported");
     }
 
-    text_utils::cut4(text);
-    text_utils::replace_all(text, "\n\n", "\n");
+    StringUtils::cut4(text);
+    StringUtils::replace_all(text, "\n\n", "\n");
 
-    std::vector<std::string> sentences = text_utils::split(text, '\n');
-    sentences = text_utils::merge_short_sentences(sentences, 5);
+    std::vector<std::string> sentences = StringUtils::split(text, '\n');
+    sentences = StringUtils::merge_short_sentences(sentences, 5);
 
     // drop empty sentences
-    sentences.erase(std::remove_if(sentences.begin(), sentences.end(), [](const std::string& s) { return text_utils::is_empty(s); }), sentences.end());
+    sentences.erase(std::remove_if(sentences.begin(), sentences.end(), [](const std::string& s) { return StringUtils::is_empty(s); }), sentences.end());
 
     // add a dot at the end of the sentence if it is missing
     for (auto& sentence : sentences) {
-        std::u32string sentence_u32 = text_utils::converter.from_bytes(sentence);
-        if (!text_utils::is_delimiter(sentence_u32.back())) {
+        std::u32string sentence_u32 = StringUtils::converter.from_bytes(sentence);
+        if (!StringUtils::is_delimiter(sentence_u32.back())) {
             sentence = sentence + ((lang == "en") ? "." : "。");
         }
     }
 
-    sentences = text_utils::split_long_sentences(sentences);
+    sentences = StringUtils::split_long_sentences(sentences);
 
     return sentences;
 }
@@ -93,6 +93,6 @@ TextPreprocessor::extract_features(const std::vector<std::string>& textlist, con
     std::vector<int> phones_list;
     std::vector<std::string> norm_text_list;
 
-    std::string norm_text = text_utils::join("", textlist);
+    std::string norm_text = StringUtils::join("", textlist);
     return std::make_tuple(phones_list, norm_text);
 }

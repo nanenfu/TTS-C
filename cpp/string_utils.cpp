@@ -4,9 +4,9 @@
 #include <codecvt>
 #include <locale>
 
-#include "text_utils.h"
+#include "string_utils.h"
 
-namespace text_utils {
+namespace StringUtils {
     /**
      * Function to trim leading and trailing characters
      *

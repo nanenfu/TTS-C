@@ -5,7 +5,7 @@
 #include <codecvt>
 #include <locale>
 
-namespace text_utils {
+namespace StringUtils {
     bool is_delimiter(const char c);
     bool is_delimiter(const char32_t c);
     bool is_empty(const std::string& str);
