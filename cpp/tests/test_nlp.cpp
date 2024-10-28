@@ -12,3 +12,10 @@ TEST_CASE("seg_text", "[NLP]") {
     REQUIRE(langlist.size() == 1);
     REQUIRE(langlist[0] == "en");
 }
+
+TEST_CASE("normalize_text", "[NLP]") {
+    std::string text = "Hello; world!";
+    NLP::normalize_text(text, "en");
+
+    REQUIRE(text == "Hello, world!");
+}

@@ -93,6 +93,16 @@ TextPreprocessor::extract_features(const std::vector<std::string>& textlist, con
     std::vector<int> phones_list;
     std::vector<std::string> norm_text_list;
 
+    for (int i = 0; i < textlist.size(); i++) {
+        std::string text = textlist[i];
+        std::string lang = langlist[i];
+
+        NLP::normalize_text(text, lang);
+        std::vector<std::string> phones = NLP::g2p(text, lang);
+
+        norm_text_list.push_back(text);
+    }
+
     std::string norm_text = StringUtils::join("", textlist);
     return std::make_tuple(phones_list, norm_text);
 }
