@@ -12,4 +12,6 @@ namespace NLP {
 
     extern std::unordered_map<std::string, std::vector<std::vector<std::string>>> g2p_en_dict;
     void load_g2p_en_dict();
+
+    std::vector<std::string> tokenize(const std::string& text);
 }

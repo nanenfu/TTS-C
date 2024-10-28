@@ -25,3 +25,10 @@ TEST_CASE("load_g2p_en_dict should load g2p_en_dict", "[NLP]") {
 
     REQUIRE(NLP::g2p_en_dict["ZZZZ"][0][0] == "Z");
 }
+
+TEST_CASE("tokenize should split sentence into tokens", "[NLP]") {
+    std::vector<std::string> tokens = NLP::tokenize("Lorem? ipsum! dolor sit amet.");
+
+    REQUIRE(tokens.size() == 14);
+    REQUIRE(tokens[0] == "Lorem");
+}

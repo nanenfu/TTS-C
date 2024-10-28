@@ -6,6 +6,7 @@
 #include <fstream>
 #include <cassert>
 #include <nlohmann/json.hpp>
+#include <regex>
 
 #include "nlp.h"
 #include "string_utils.h"
@@ -66,5 +67,19 @@ namespace NLP {
             load_g2p_en_dict();
         }
         return std::vector<std::string>{};
+    }
+
+    std::vector<std::string> tokenize(const std::string& text) {
+        std::regex re(R"([,;.\-\?\!\s+])");
+
+        std::sregex_token_iterator iter(text.begin(), text.end(), re, {-1, 0});
+        std::sregex_token_iterator end;
+
+        std::vector<std::string> tokens;
+        for (; iter != end; ++iter) {
+            tokens.push_back(*iter);
+        }
+
+        return tokens;
     }
 }
