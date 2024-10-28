@@ -1,3 +1,5 @@
+# A script to generate g2p_en_dict.json file for C++ implementation
+
 import json
 from text.english import read_dict_new
 
