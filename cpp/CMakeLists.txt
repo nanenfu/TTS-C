@@ -24,8 +24,13 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
   GIT_TAG        v3.7.1
 )
-
 FetchContent_MakeAvailable(Catch2)
+
+FetchContent_Declare(
+  json URL
+  https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+)
+FetchContent_MakeAvailable(json)
 
 # Find packages
 find_package(SndFile REQUIRED)
@@ -40,7 +45,11 @@ add_executable(tests
                 tests/test_nlp.cpp
 )
 
-target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(tests
+                      PRIVATE
+                        Catch2::Catch2WithMain
+                        nlohmann_json::nlohmann_json
+                      )
 target_include_directories(tests PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 
 # Automatic test registration
@@ -63,6 +72,7 @@ target_link_libraries(tts_cpp
                         onnxruntime
                         SndFile::sndfile
                         cnpy
+                        nlohmann_json::nlohmann_json
                     )
 
 target_include_directories(tts_cpp PRIVATE ${cnpy_SOURCE_DIR})
@@ -70,3 +80,4 @@ target_include_directories(tts_cpp PRIVATE ${cnpy_SOURCE_DIR})
 # Additional files
 file(COPY onnx/ DESTINATION onnx)
 file(COPY ssl_content.npy DESTINATION .)
+file(COPY g2p_en_dict.json DESTINATION .)

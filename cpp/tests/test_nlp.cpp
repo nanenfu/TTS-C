@@ -19,3 +19,9 @@ TEST_CASE("normalize_text", "[NLP]") {
 
     REQUIRE(text == "Hello, world!");
 }
+
+TEST_CASE("load_g2p_en_dict should load g2p_en_dict", "[NLP]") {
+    NLP::load_g2p_en_dict();
+
+    REQUIRE(NLP::g2p_en_dict["ZZZZ"][0][0] == "Z");
+}
