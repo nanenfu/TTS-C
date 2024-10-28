@@ -77,7 +77,7 @@ std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const 
 
 std::tuple<std::vector<int>, std::string>
     TextPreprocessor::segment_and_extract_feature_for_text(const std::string& text, const std::string& lang) {
-    auto [textlist, langlist] = nlp::seg_text(text, lang);
+    auto [textlist, langlist] = NLP::seg_text(text, lang);
 
     if (textlist.empty()) {
         return std::make_tuple(std::vector<int>(), "");

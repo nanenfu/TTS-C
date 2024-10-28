@@ -8,7 +8,7 @@
 namespace StringUtils {
     bool is_delimiter(const char c);
     bool is_delimiter(const char32_t c);
-    bool is_empty(const std::string& str);
+    bool is_empty(const std::string_view str);
     void trim_char(std::string& str, char c);
     void trim(std::string& str);
     void replace_all(std::string &str, const std::string &toReplace, const std::string &replaceWith);

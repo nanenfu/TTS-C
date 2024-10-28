@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-namespace nlp {
+namespace NLP {
     /**
      * @brief Segment text into chunks by its language.
      * 

@@ -259,7 +259,7 @@ namespace StringUtils {
      *
      * @param str The input string
      */
-    bool is_empty(const std::string& str) {
+    bool is_empty(const std::string_view str) {
         return std::all_of(str.begin(), str.end(), [](char c) { return std::isspace(c); });
     }
 
