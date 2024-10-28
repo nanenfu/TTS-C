@@ -7,9 +7,11 @@
 #include <string>
 #include <any>
 #include <tuple>
+#include <cassert>
 
 #include "string_utils.h"
 #include "nlp.h"
+#include "symbols.h"
 #include "text_preprocessor.h"
 
 std::vector<std::map<std::string, std::any>> TextPreprocessor::preprocess(const std::string& text, const std::string& lang, const std::string& text_split_method) {
@@ -101,6 +103,16 @@ TextPreprocessor::extract_features(const std::vector<std::string>& textlist, con
         std::vector<std::string> phones = NLP::g2p(text, lang);
 
         norm_text_list.push_back(text);
+
+        // get index of each phone from NLP::symbols list
+        for (const auto& phone : phones) {
+            auto it = std::find(NLP::symbols.begin(), NLP::symbols.end(), phone);
+            if (it != NLP::symbols.end()) {
+                phones_list.push_back(std::distance(NLP::symbols.begin(), it));
+            } else {
+                assert(false);
+            }
+        }
     }
 
     std::string norm_text = StringUtils::join("", textlist);

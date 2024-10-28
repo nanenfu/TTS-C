@@ -57,6 +57,7 @@ TEST_CASE("pre_seg_text", "[TextPreprocessor]") {
 }
 
 TEST_CASE("preprocess", "[TextPreprocessor]") {
+    text = "Hello, how are you doing today?";
     std::vector<std::map<std::string, std::any>> result = TextPreprocessor::preprocess(text, lang, text_split_method);
 
     // display the result

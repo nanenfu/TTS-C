@@ -11,7 +11,6 @@
 #include "nlp.h"
 #include "string_utils.h"
 
-
 namespace NLP {
     // unordered_map for faster lookup
     std::unordered_map<std::string, std::vector<std::vector<std::string>>> g2p_en_dict;
@@ -66,7 +65,26 @@ namespace NLP {
         if (g2p_en_dict.empty()) {
             load_g2p_en_dict();
         }
-        return std::vector<std::string>{};
+        std::vector<std::string> tokens = tokenize(text.data());
+        std::vector<std::string> phones;
+
+        for (auto& token : tokens) {
+            // upper case
+            std::transform(token.begin(), token.end(), token.begin(), ::toupper);
+
+            if (g2p_en_dict.find(token) != g2p_en_dict.end()) {
+                // copy to phones
+                for (const auto& phns : g2p_en_dict[token]) {
+                    for (const auto& phone : phns) {
+                        phones.push_back(phone);
+                    }
+                }
+            } else {
+                std::cout << "No phonetic transcription for " << token << std::endl;
+            }
+        }
+
+        return phones;
     }
 
     std::vector<std::string> tokenize(const std::string& text) {

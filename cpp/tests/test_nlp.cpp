@@ -32,3 +32,14 @@ TEST_CASE("tokenize should split sentence into tokens", "[NLP]") {
     REQUIRE(tokens.size() == 14);
     REQUIRE(tokens[0] == "Lorem");
 }
+
+TEST_CASE("g2p should split sentence into phone", "[NLP]") {
+    std::vector<std::string> phones = NLP::g2p("Hello! How are you?", "en");
+    // print the phones
+    for (const auto& phone : phones) {
+        std::cout << phone << " ";
+    }
+
+    REQUIRE(phones.size() == 10);
+    REQUIRE(phones[0] == "HH");
+}
