@@ -40,6 +40,7 @@ add_executable(tests
                 model.cpp
                 text_preprocessor.cpp
                 string_utils.cpp
+                onnx_utils.cpp
                 nlp.cpp
                 tests/test_text_preprocessor.cpp
                 tests/test_string_utils.cpp
@@ -62,9 +63,10 @@ include(Catch)
 catch_discover_tests(tests)
 
 # Main executable
-add_executable(tts_cpp
+add_executable( tts_cpp
                 model.cpp
                 string_utils.cpp
+                onnx_utils.cpp
                 nlp.cpp
                 text_preprocessor.cpp
                 main.cpp
