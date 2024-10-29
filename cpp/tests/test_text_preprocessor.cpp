@@ -58,15 +58,12 @@ TEST_CASE("pre_seg_text", "[TextPreprocessor]") {
 
 TEST_CASE("preprocess", "[TextPreprocessor]") {
     text = "Hello, how are you doing today?";
-    std::vector<std::map<std::string, std::any>> result = TextPreprocessor::preprocess(text, lang, text_split_method);
+    std::vector<int64_t> phones = TextPreprocessor::preprocess(text, lang, text_split_method);
 
     // display the result
-    for (auto& text_map : result) {
-        std::cout << "norm_text: " << std::any_cast<std::string>(text_map["norm_text"]) << std::endl;
-        std::cout << "phones: ";
-        for (auto& phone : std::any_cast<std::vector<int>>(text_map["phones"])) {
-            std::cout << phone << " ";
-        }
-        std::cout << std::endl;
+    std::cout << "phones: ";
+    for (auto& phone : phones) {
+        std::cout << phone << " ";
     }
+    std::cout << std::endl;
 }

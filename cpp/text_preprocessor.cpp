@@ -14,10 +14,10 @@
 #include "symbols.h"
 #include "text_preprocessor.h"
 
-std::vector<std::map<std::string, std::any>> TextPreprocessor::preprocess(const std::string& text, const std::string& lang, const std::string& text_split_method) {
+std::vector<int64_t> TextPreprocessor::preprocess(const std::string& text, const std::string& lang, const std::string& text_split_method) {
     std::vector<std::string> texts = pre_seg_text(text, lang, text_split_method);
 
-    std::vector<std::map<std::string, std::any>> result;
+    std::vector<int64_t> result_phones;
 
     for (auto& text : texts) {
         auto [phones, norm_text] = segment_and_extract_feature_for_text(text, lang);
@@ -26,14 +26,11 @@ std::vector<std::map<std::string, std::any>> TextPreprocessor::preprocess(const 
             continue;
         }
 
-        std::map<std::string, std::any> text_map;
-        text_map["norm_text"] = norm_text;
-        text_map["phones"] = phones;
-
-        result.push_back(text_map);
+        // add phones to result_phones
+        result_phones.insert(result_phones.end(), phones.begin(), phones.end());
     }
 
-    return result;
+    return result_phones;
 }
 
 std::vector<std::string> TextPreprocessor::pre_seg_text(std::string text, const std::string& lang, const std::string& text_split_method) {

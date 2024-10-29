@@ -1,11 +1,12 @@
-#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 #include <vector>
 #include <iostream>
 #include <utility>
 #include <map>
 #include <string>
 #include <sndfile.h>
+#include <complex>
 #include "cnpy.h"
+#include "model.h"
 
 #include "text_preprocessor.h"
 
@@ -27,57 +28,28 @@ void save_audio(const std::vector<float>& audio_data, const std::string& file_pa
     sf_close(outfile);
 }
 
-// Adapted from the Enfu's code
-void run_vits_onnx_model(std::string onnx_model_path, std::vector<int64_t> text_seq, std::vector<int64_t> pred_semantic) {
-    Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "test");
-    Ort::SessionOptions session_options;
-    session_options.SetIntraOpNumThreads(1);
+/**
+ * Load the SSL content from the ssl_content.npy file
+ */
+void load_ssl_content(std::vector<std::vector<std::vector<float>>>& ssl_content) {
+    const cnpy::NpyArray ssl_content_numpy { cnpy::npy_load("ssl_content.npy") };
+    assert(ssl_content_numpy.word_size == sizeof(float));
 
-    Ort::Session session(env, onnx_model_path.c_str(), session_options);
-
-    auto memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
-
-    Ort::AllocatorWithDefaultOptions allocator;
-    Ort::AllocatedStringPtr input_name_ptr1 = session.GetInputNameAllocated(0, allocator);
-    Ort::AllocatedStringPtr input_name_ptr2 = session.GetInputNameAllocated(1, allocator);
-    Ort::AllocatedStringPtr output_name_ptr = session.GetOutputNameAllocated(0, allocator);
-
-    const char* input_name1 = input_name_ptr1.get();
-    const char* input_name2 = input_name_ptr2.get();
-    const char* output_name = output_name_ptr.get();
-
-    std::cout << "Number of inputs: " << session.GetInputCount() << std::endl;
-    std::cout << "Input 0 name: " << input_name1 << std::endl;
-    std::cout << "Input 1 name: " << input_name2 << std::endl;
-    std::cout << "Output name: " << output_name << std::endl;
-
-
-    std::vector<int64_t> text_seq_modifiable = text_seq;
-    std::vector<int64_t> input_dims1 = {1, static_cast<int64_t>(text_seq_modifiable.size())};
-
-    Ort::Value input_tensor1 = Ort::Value::CreateTensor<int64_t>(
-        memory_info, text_seq_modifiable.data(), text_seq_modifiable.size(), input_dims1.data(), input_dims1.size());
-
-    std::vector<int64_t> pred_semantic_modifiable = pred_semantic;
-    std::vector<int64_t> input_dims2 = {1, 1, static_cast<int64_t>(pred_semantic_modifiable.size())};
-
-    Ort::Value input_tensor2 = Ort::Value::CreateTensor<int64_t>(
-        memory_info, pred_semantic_modifiable.data(), pred_semantic_modifiable.size(), input_dims2.data(), input_dims2.size());
-
-    std::vector<const char*> input_names = {input_name1, input_name2};
-    std::vector<Ort::Value> inputs;
-    inputs.push_back(std::move(input_tensor1));
-    inputs.push_back(std::move(input_tensor2));
-
-    auto outputs = session.Run(Ort::RunOptions{nullptr}, input_names.data(), inputs.data(), inputs.size(), &output_name, 1);
-    float* audio_output = outputs[0].GetTensorMutableData<float>();
-    size_t audio_output_size = outputs[0].GetTensorTypeAndShapeInfo().GetElementCount();
-
-    std::vector<float> output = std::vector<float>(audio_output, audio_output + audio_output_size);
-    save_audio(output, "output.wav", 32000);
-    std::cout << "Audio saved as 'output.wav'" << std::endl;
+    const float* ssl_content_data = ssl_content_numpy.data<float>();
+    
+    // fill ssl_content from loaded_data
+    for (size_t i = 0; i < ssl_content_numpy.shape[0]; ++i) {
+        std::vector<std::vector<float>> ssl_content_row;
+        for (size_t j = 0; j < ssl_content_numpy.shape[1]; ++j) {
+            std::vector<float> ssl_content_col;
+            for (size_t k = 0; k < ssl_content_numpy.shape[2]; ++k) {
+                ssl_content_col.push_back(ssl_content_data[i * ssl_content_numpy.shape[1] * ssl_content_numpy.shape[2] + j * ssl_content_numpy.shape[2] + k]);
+            }
+            ssl_content_row.push_back(ssl_content_col);
+        }
+        ssl_content.push_back(ssl_content_row);
+    }
 }
-
 
 int main() {
     // Run T2S model to generate y
@@ -92,18 +64,31 @@ int main() {
     const std::string lang { "en" };
     const std::string text_split_method { "cut4" };
     TextPreprocessor text_preprocessor;
-    std::vector<std::map<std::string, std::any>> result = text_preprocessor.preprocess(text, lang, text_split_method);
+    std::vector<int64_t> text_seq = text_preprocessor.preprocess(text, lang, text_split_method);
+    // print text_seq
+    std::cout << "text_seq = ";
+    for (int i : text_seq) {
+        std::cout << i << " ";
+    }
+    std::cout << std::endl;
 
-    const std::vector<int64_t> text_seq {60, 13, 75, 80, 27, 12, 80, 88, 13, 90, 13, 75, 1, 91, 58, 61,
-                                        10, 64, 63, 42, 61, 55, 80, 55, 49, 91, 58, 80, 74, 22, 3};
+    const std::vector<int64_t> ref_seq { 10, 64, 26, 75, 42, 1, 64, 68, 1, 64, 68, 1, 55, 80, 75, 68, 61, 42, 1, 51, 58, 68, 64, 62, 57, 75, 63, 68, 61, 75, 91, 35, 64, 51, 58, 26, 74, 55, 65, 61, 75, 3, 26, 84, 74, 54, 65, 27, 12, 63, 7, 64, 12, 62, 17, 50, 1, 91, 13, 80, 22, 62, 26, 88, 55, 93, 22, 62, 60, 13, 75, 80, 80, 16, 61, 80, 88, 10, 64, 7, 26, 57, 12, 64, 75, 63, 35, 63, 24, 38, 3 };
 
-    const std::vector<int64_t> pred_semantic {361, 643, 479, 150, 753, 760, 644, 45, 996, 42, 744, 785, 790, 619, 251, 319, 488,
-                                        783, 127, 660, 331, 637, 32, 528, 934, 303, 740, 9, 908, 837, 325, 201, 55, 385,
-                                        921, 256, 369, 887, 827, 355, 145, 293, 989, 988, 84, 378, 727, 180, 180, 263, 496,
-                                        175, 902, 278, 748, 748, 52, 0};
+    const std::vector<std::vector<int64_t>> ref_bert(ref_seq.size(), std::vector<int64_t>(1024, 0.0f));
+    const std::vector<std::vector<int64_t>> text_bert(ref_seq.size(), std::vector<int64_t>(1024, 0.0f));
 
-    const cnpy::NpyArray ssl_content { cnpy::npy_load("ssl_content.npy") };
+    std::vector<std::vector<std::vector<float>>> ssl_content;
+    load_ssl_content(ssl_content);
 
-    run_vits_onnx_model(onnx_model_path, text_seq, pred_semantic);
+    const std::vector<int64_t> pred_semantic { run_t2s_onnx_model(onnx_encoder_path, onnx_fsdec_path,
+            onnx_sdec_path, ref_seq, text_seq, ref_bert, text_bert, ssl_content[0], 0) };
+
+    const std::vector<float> audio_output = run_vits_onnx_model(onnx_model_path, text_seq, pred_semantic);
+
+    // Save the audio
+    const std::string output_file_path { "output.wav" };
+    save_audio(audio_output, output_file_path, 32000);
+    std::cout << "Audio saved as '" << output_file_path << "'" << std::endl;
+
     return 0;
 }

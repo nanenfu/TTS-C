@@ -37,6 +37,7 @@ find_package(SndFile REQUIRED)
 
 # Tests
 add_executable(tests
+                model.cpp
                 text_preprocessor.cpp
                 string_utils.cpp
                 nlp.cpp
@@ -47,6 +48,7 @@ add_executable(tests
 
 target_link_libraries(tests
                       PRIVATE
+                        onnxruntime
                         Catch2::Catch2WithMain
                         nlohmann_json::nlohmann_json
                       )
@@ -61,6 +63,7 @@ catch_discover_tests(tests)
 
 # Main executable
 add_executable(tts_cpp
+                model.cpp
                 string_utils.cpp
                 nlp.cpp
                 text_preprocessor.cpp
