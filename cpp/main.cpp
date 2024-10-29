@@ -36,7 +36,7 @@ void load_ssl_content(std::vector<std::vector<std::vector<float>>>& ssl_content)
     assert(ssl_content_numpy.word_size == sizeof(float));
 
     const float* ssl_content_data = ssl_content_numpy.data<float>();
-    
+
     // fill ssl_content from loaded_data
     for (size_t i = 0; i < ssl_content_numpy.shape[0]; ++i) {
         std::vector<std::vector<float>> ssl_content_row;
@@ -60,20 +60,27 @@ int main() {
     const std::string onnx_model_path { "onnx/" + project_name + "/test3_vits.onnx" };
 
     // Step 1: Use the TextPreprocessor class to get text_seq
-    const std::string text { "\n\n\njust the two of us. we can make it if we try\n\n" };
+    const std::string text { "just the two of us, we can make it if we try" };
     const std::string lang { "en" };
     const std::string text_split_method { "cut4" };
     TextPreprocessor text_preprocessor;
-    std::vector<int64_t> text_seq = text_preprocessor.preprocess(text, lang, text_split_method);
+    std::vector<int64_t> all_phones = text_preprocessor.preprocess(text, lang, text_split_method);
+    std::vector<std::vector<int64_t>> text_seq{ all_phones };
     // print text_seq
     std::cout << "text_seq = ";
-    for (int i : text_seq) {
+    for (int i : text_seq[0]) {
         std::cout << i << " ";
     }
     std::cout << std::endl;
 
-    const std::vector<int64_t> ref_seq { 10, 64, 26, 75, 42, 1, 64, 68, 1, 64, 68, 1, 55, 80, 75, 68, 61, 42, 1, 51, 58, 68, 64, 62, 57, 75, 63, 68, 61, 75, 91, 35, 64, 51, 58, 26, 74, 55, 65, 61, 75, 3, 26, 84, 74, 54, 65, 27, 12, 63, 7, 64, 12, 62, 17, 50, 1, 91, 13, 80, 22, 62, 26, 88, 55, 93, 22, 62, 60, 13, 75, 80, 80, 16, 61, 80, 88, 10, 64, 7, 26, 57, 12, 64, 75, 63, 35, 63, 24, 38, 3 };
-
+    const std::vector<std::vector<int64_t>> ref_seq {
+            {   10, 64, 26, 75, 42, 1, 64, 68, 1, 64, 68, 1, 55, 80, 75, 68, 61, 42,
+                1, 51, 58, 68, 64, 62, 57, 75, 63, 68, 61, 75, 91, 35, 64, 51, 58, 26,
+                74, 55, 65, 61, 75, 3, 26, 84, 74, 54, 65, 27, 12, 63, 7, 64, 12, 62, 17,
+                50, 1, 91, 13, 80, 22, 62, 26, 88, 55, 93, 22, 62, 60, 13, 75, 80, 80, 16,
+                61, 80, 88, 10, 64, 7, 26, 57, 12, 64, 75, 63, 35, 63, 24, 38, 3
+            }
+    };
     const std::vector<std::vector<int64_t>> ref_bert(ref_seq.size(), std::vector<int64_t>(1024, 0.0f));
     const std::vector<std::vector<int64_t>> text_bert(ref_seq.size(), std::vector<int64_t>(1024, 0.0f));
 
@@ -81,9 +88,9 @@ int main() {
     load_ssl_content(ssl_content);
 
     const std::vector<int64_t> pred_semantic { run_t2s_onnx_model(onnx_encoder_path, onnx_fsdec_path,
-            onnx_sdec_path, ref_seq, text_seq, ref_bert, text_bert, ssl_content[0], 0) };
+            onnx_sdec_path, ref_seq, text_seq, ref_bert, text_bert, ssl_content, 0) };
 
-    const std::vector<float> audio_output = run_vits_onnx_model(onnx_model_path, text_seq, pred_semantic);
+    const std::vector<float> audio_output = run_vits_onnx_model(onnx_model_path, text_seq[0], pred_semantic);
 
     // Save the audio
     const std::string output_file_path { "output.wav" };
