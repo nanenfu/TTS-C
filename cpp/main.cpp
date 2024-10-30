@@ -7,8 +7,11 @@
 #include <complex>
 
 #include "ssl_content.h"
+
 #include "encoder.h"
 #include "fsdecoder.h"
+#include "ssdecoder.h"
+#include "vits.h"
 
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 
@@ -79,19 +82,22 @@ int main() {
         fsdecoder.run(encoder_result)
     };
 
-    // const std::vector<int64_t> pred_semantic {
-    //     run_t2s_onnx_model(onnx_encoder_path, onnx_fsdec_path,
-    //         onnx_sdec_path, ref_seq, text_seq, ref_bert, text_bert, ssl_content, 0)
-    // };
+    const int early_stop_num = 2700;
+    SSDecoder ssdecoder(onnx_sdec_path, env, memory_info);
+    const std::vector<int64_t> pred_semantic {
+        ssdecoder.run(fsdecoder_result, early_stop_num)
+    };
 
-    // const std::vector<float> audio_output {
-    //     run_vits_onnx_model(onnx_model_path, text_seq, pred_semantic)
-    // };
+    Vits vits(onnx_model_path, env, memory_info);
 
-    // // Save the audio
-    // const std::string output_file_path { "output.wav" };
-    // save_audio(audio_output, output_file_path, 32000);
-    // std::cout << "Audio saved as '" << output_file_path << "'" << std::endl;
+    const std::vector<float> audio_output {
+        vits.run(text_seq, pred_semantic)
+    };
+
+    // Save the audio
+    const std::string output_file_path { "output.wav" };
+    save_audio(audio_output, output_file_path, 32000);
+    std::cout << "Audio saved as '" << output_file_path << "'" << std::endl;
 
     return 0;
 }

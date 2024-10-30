@@ -40,6 +40,7 @@ add_executable(tests
                 vits.cpp
                 encoder.cpp
                 fsdecoder.cpp
+                ssdecoder.cpp
                 text_preprocessor.cpp
                 string_utils.cpp
                 onnx_utils.cpp
@@ -73,6 +74,7 @@ add_executable( tts_cpp
                 vits.cpp
                 encoder.cpp
                 fsdecoder.cpp
+                ssdecoder.cpp
                 string_utils.cpp
                 onnx_utils.cpp
                 nlp.cpp

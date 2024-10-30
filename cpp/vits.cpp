@@ -7,7 +7,9 @@
 #include "vits.h"
 #include "onnx_utils.h"
 
-Vits::Vits(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryInfo& memory_info) {
+Vits::Vits(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryInfo& _memory_info)
+            : memory_info(_memory_info)
+{
     std::cout << "Loading ONNX models from " << onnx_model_path << std::endl;
     Ort::SessionOptions encoder_session_options;
     session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), encoder_session_options);
@@ -17,11 +19,8 @@ Vits::Vits(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryInfo& m
 }
 
 // Adapted from the Enfu's code
-std::vector<float> Vits::run(std::string onnx_model_path, std::vector<int64_t> text_seq,
-                                        std::vector<int64_t> pred_semantic) const
+std::vector<float> Vits::run(std::vector<int64_t> text_seq, std::vector<int64_t> pred_semantic) const
 {
-    auto memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
-
     Ort::AllocatorWithDefaultOptions allocator;
     Ort::AllocatedStringPtr input_name_ptr1 = session->GetInputNameAllocated(0, allocator);
     Ort::AllocatedStringPtr input_name_ptr2 = session->GetInputNameAllocated(1, allocator);
