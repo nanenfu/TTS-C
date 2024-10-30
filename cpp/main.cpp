@@ -7,7 +7,10 @@
 #include <complex>
 
 #include "ssl_content.h"
+#include "encoder.h"
+#include "fsdecoder.h"
 
+#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 
 #include "text_preprocessor.h"
 
@@ -62,6 +65,20 @@ int main() {
 
     std::vector<std::vector<std::vector<float>>> ssl_content;
     load_ssl_content(ssl_content);
+
+    Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "test");
+    auto memory_info { Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault) };
+    Encoder encoder(onnx_encoder_path, env, memory_info);
+
+    std::vector<float> x_result;
+    std::vector<int64_t> x_shape;
+    std::vector<int64_t> prompts_result;
+    std::vector<int64_t> prompts_shape;
+
+    encoder.run(ref_seq, text_seq, ref_bert, text_bert, ssl_content, x_result, x_shape, prompts_result, prompts_shape);
+
+    FSDecoder fsdecoder(onnx_fsdec_path, env, memory_info);
+    fsdecoder.run(x_result, x_shape, prompts_result, prompts_shape);
 
     // const std::vector<int64_t> pred_semantic {
     //     run_t2s_onnx_model(onnx_encoder_path, onnx_fsdec_path,

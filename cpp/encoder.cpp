@@ -9,13 +9,15 @@
 #include "encoder.h"
 #include "onnx_utils.h"
 
-Encoder::Encoder(const std::string& onnx_encoder_path, Ort::Env& env) {
-    std::cout << "Loading ONNX models from " << onnx_encoder_path << std::endl;
+Encoder::Encoder(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryInfo& _memory_info)
+                    : memory_info(_memory_info)
+{
+    std::cout << "Loading ONNX models from " << onnx_model_path << std::endl;
     Ort::SessionOptions encoder_session_options;
-    encoder_session = std::make_unique<Ort::Session>(env, onnx_encoder_path.c_str(), encoder_session_options);
+    session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), encoder_session_options);
 
     std::cout << "Encoder model info: " << std::endl;
-    display_model_info(*encoder_session);
+    display_model_info(*session);
 }
 
 void Encoder::run(std::vector<int64_t> ref_seq,
@@ -28,8 +30,6 @@ void Encoder::run(std::vector<int64_t> ref_seq,
                     std::vector<int64_t>& prompts_result,
                     std::vector<int64_t>& prompts_shape) const
 {
-    auto memory_info { Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault) };
-
     std::vector<int64_t> input_dims1 { 1, static_cast<int64_t>(ref_seq.size()) };
     Ort::Value input_tensor1 {
         Ort::Value::CreateTensor<int64_t>(memory_info, ref_seq.data(), ref_seq.size(),
@@ -94,7 +94,7 @@ void Encoder::run(std::vector<int64_t> ref_seq,
     std::vector<const char*> output_names { "x", "prompts" };
 
     std::cout << "Running encoder..." << std::endl;
-    auto outputs = encoder_session->Run(Ort::RunOptions{nullptr},
+    auto outputs = session->Run(Ort::RunOptions{nullptr},
                                         input_names.data(), inputs.data(), inputs.size(),
                                         output_names.data(), output_names.size());
     std::cout << "Encoder run successfully" << std::endl;

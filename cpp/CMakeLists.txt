@@ -39,7 +39,7 @@ find_package(SndFile REQUIRED)
 add_executable(tests
                 vits.cpp
                 encoder.cpp
-                decoder.cpp
+                fsdecoder.cpp
                 text_preprocessor.cpp
                 string_utils.cpp
                 onnx_utils.cpp
@@ -72,6 +72,7 @@ catch_discover_tests(tests)
 add_executable( tts_cpp
                 vits.cpp
                 encoder.cpp
+                fsdecoder.cpp
                 string_utils.cpp
                 onnx_utils.cpp
                 nlp.cpp

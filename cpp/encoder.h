@@ -8,7 +8,7 @@
 
 class Encoder {
 public:
-    Encoder(const std::string& onnx_encoder_path, Ort::Env& env);
+    Encoder(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryInfo& memory_info);
     void run(std::vector<int64_t> ref_seq,
                 std::vector<int64_t> text_seq,
                 std::vector<std::vector<float>> ref_bert,
@@ -19,5 +19,6 @@ public:
                 std::vector<int64_t>& prompts_result,
                 std::vector<int64_t>& prompts_shape) const;
 private:
-    std::unique_ptr<Ort::Session> encoder_session;
+    Ort::MemoryInfo& memory_info;
+    std::unique_ptr<Ort::Session> session;
 };

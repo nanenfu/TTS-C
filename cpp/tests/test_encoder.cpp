@@ -9,7 +9,8 @@ TEST_CASE("run should run inference", "[Encoder]") {
     Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "test");
     const std::string project_name { "test3" };
     const std::string onnx_encoder_path { "onnx/" + project_name + "/" + project_name + "_t2s_encoder.onnx" };
-    Encoder encoder(onnx_encoder_path, env);
+    auto memory_info { Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault) };
+    Encoder encoder(onnx_encoder_path, env, memory_info);
 
     const std::vector<int64_t> text_seq { 60, 13, 75, 80, 27, 12, 80, 88,
                                     13, 90, 13, 75, 91, 58, 61, 10,
