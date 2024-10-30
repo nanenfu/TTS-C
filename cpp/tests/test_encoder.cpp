@@ -31,14 +31,12 @@ TEST_CASE("run should run inference", "[Encoder]") {
     std::vector<std::vector<std::vector<float>>> ssl_content;
     load_ssl_content(ssl_content);
 
-    std::vector<float> x_result;
-    std::vector<int64_t> x_shape;
-    std::vector<int64_t> prompts_result;
-    std::vector<int64_t> prompts_shape;
-    encoder.run(ref_seq, text_seq, ref_bert, text_bert, ssl_content, x_result, x_shape, prompts_result, prompts_shape);
+    EncoderResult encoder_result {
+        encoder.run(ref_seq, text_seq, ref_bert, text_bert, ssl_content)
+    };
 
-    REQUIRE(x_result.size() == 61440);
-    REQUIRE(x_shape.size() == 3);
-    REQUIRE(prompts_result.size() == 159);
-    REQUIRE(prompts_shape.size() == 2);
+    REQUIRE(encoder_result.x.size() == 61440);
+    REQUIRE(encoder_result.x_shape.size() == 3);
+    REQUIRE(encoder_result.prompts.size() == 159);
+    REQUIRE(encoder_result.prompts_shape.size() == 2);
 }

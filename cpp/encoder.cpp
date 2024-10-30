@@ -20,15 +20,11 @@ Encoder::Encoder(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryI
     display_model_info(*session);
 }
 
-void Encoder::run(std::vector<int64_t> ref_seq,
+EncoderResult Encoder::run(std::vector<int64_t> ref_seq,
                     std::vector<int64_t> text_seq,
                     std::vector<std::vector<float>> ref_bert,
                     std::vector<std::vector<float>> text_bert,
-                    std::vector<std::vector<std::vector<float>>> ssl_content,
-                    std::vector<float>& x_result,
-                    std::vector<int64_t>& x_shape,
-                    std::vector<int64_t>& prompts_result,
-                    std::vector<int64_t>& prompts_shape) const
+                    std::vector<std::vector<std::vector<float>>> ssl_content) const
 {
     std::vector<int64_t> input_dims1 { 1, static_cast<int64_t>(ref_seq.size()) };
     Ort::Value input_tensor1 {
@@ -99,12 +95,14 @@ void Encoder::run(std::vector<int64_t> ref_seq,
                                         output_names.data(), output_names.size());
     std::cout << "Encoder run successfully" << std::endl;
 
-    x_shape = outputs[0].GetTensorTypeAndShapeInfo().GetShape();
-    print_dims("Output x", x_shape);
+    EncoderResult encoder_result;
+
+    encoder_result.x_shape = outputs[0].GetTensorTypeAndShapeInfo().GetShape();
+    print_dims("Output x", encoder_result.x_shape);
     assert(outputs[0].GetTensorTypeAndShapeInfo().GetElementType() == ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT);
 
-    prompts_shape = outputs[1].GetTensorTypeAndShapeInfo().GetShape();
-    print_dims("Output prompts", prompts_shape);
+    encoder_result.prompts_shape = outputs[1].GetTensorTypeAndShapeInfo().GetShape();
+    print_dims("Output prompts", encoder_result.prompts_shape);
     assert(outputs[1].GetTensorTypeAndShapeInfo().GetElementType() == ONNX_TENSOR_ELEMENT_DATA_TYPE_INT64);
 
     float* x_data = outputs[0].GetTensorMutableData<float>();
@@ -113,6 +111,8 @@ void Encoder::run(std::vector<int64_t> ref_seq,
     size_t x_data_size = outputs[0].GetTensorTypeAndShapeInfo().GetElementCount();
     size_t prompts_data_size = outputs[1].GetTensorTypeAndShapeInfo().GetElementCount();
 
-    x_result = std::vector<float>(x_data, x_data + x_data_size);
-    prompts_result = std::vector<int64_t>(prompts_data, prompts_data + prompts_data_size);
+    encoder_result.x = std::vector<float>(x_data, x_data + x_data_size);
+    encoder_result.prompts = std::vector<int64_t>(prompts_data, prompts_data + prompts_data_size);
+
+    return std::move(encoder_result);
 }

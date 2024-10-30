@@ -68,17 +68,16 @@ int main() {
 
     Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "test");
     auto memory_info { Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault) };
+
     Encoder encoder(onnx_encoder_path, env, memory_info);
-
-    std::vector<float> x_result;
-    std::vector<int64_t> x_shape;
-    std::vector<int64_t> prompts_result;
-    std::vector<int64_t> prompts_shape;
-
-    encoder.run(ref_seq, text_seq, ref_bert, text_bert, ssl_content, x_result, x_shape, prompts_result, prompts_shape);
+    EncoderResult encoder_result {
+        encoder.run(ref_seq, text_seq, ref_bert, text_bert, ssl_content)
+    };
 
     FSDecoder fsdecoder(onnx_fsdec_path, env, memory_info);
-    fsdecoder.run(x_result, x_shape, prompts_result, prompts_shape);
+    FSDecoderResult fsdecoder_result {
+        fsdecoder.run(encoder_result)
+    };
 
     // const std::vector<int64_t> pred_semantic {
     //     run_t2s_onnx_model(onnx_encoder_path, onnx_fsdec_path,
