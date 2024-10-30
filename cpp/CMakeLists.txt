@@ -37,23 +37,29 @@ find_package(SndFile REQUIRED)
 
 # Tests
 add_executable(tests
-                model.cpp
+                vits.cpp
+                encoder.cpp
+                decoder.cpp
                 text_preprocessor.cpp
                 string_utils.cpp
                 onnx_utils.cpp
                 nlp.cpp
+                ssl_content.cpp
                 tests/test_text_preprocessor.cpp
                 tests/test_string_utils.cpp
                 tests/test_nlp.cpp
+                tests/test_encoder.cpp
 )
 
 target_link_libraries(tests
                       PRIVATE
+                        cnpy
                         onnxruntime
                         Catch2::Catch2WithMain
                         nlohmann_json::nlohmann_json
                       )
 target_include_directories(tests PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories(tests PRIVATE ${cnpy_SOURCE_DIR})
 
 # Automatic test registration
 # https://github.com/catchorg/Catch2/blob/devel/docs/cmake-integration.md#automatic-test-registration
@@ -64,19 +70,22 @@ catch_discover_tests(tests)
 
 # Main executable
 add_executable( tts_cpp
-                model.cpp
+                vits.cpp
+                encoder.cpp
                 string_utils.cpp
                 onnx_utils.cpp
                 nlp.cpp
                 text_preprocessor.cpp
+                ssl_content.cpp
                 main.cpp
+
 )
 
 target_link_libraries(tts_cpp
                     PRIVATE
+                        cnpy
                         onnxruntime
                         SndFile::sndfile
-                        cnpy
                         nlohmann_json::nlohmann_json
                     )
 

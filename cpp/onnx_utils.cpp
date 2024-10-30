@@ -96,13 +96,13 @@ void display_model_info(Ort::Session& session) {
 }
 
 /**
- * This function display input dimensions
+ * This function display dimensions
  * 
- * @param dims The input dimensions
  * @param input_name The input name
+ * @param dims The  dimensions
  */
-void display_input_dims(const std::vector<int64_t>& dims, const std::string& input_name) {
-    std::cout << "Input " << input_name << " dims: ";
+void print_dims(const std::string& name, const std::vector<int64_t>& dims) {
+    std::cout << name << " dims: ";
     for (int j = 0; j < dims.size(); j++) {
         std::cout << dims[j] << " ";
     }

@@ -6,7 +6,7 @@
 
 std::string tensor_type_conv(ONNXTensorElementDataType type);
 void display_model_info(Ort::Session& session);
-void display_input_dims(const std::vector<int64_t>& dims, const std::string& input_name);
+void print_dims(const std::string& name, const std::vector<int64_t>& dims);
 
 /**
  * This function flatten a 3D vector to a 1D vector

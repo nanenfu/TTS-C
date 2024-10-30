@@ -5,8 +5,9 @@
 #include <string>
 #include <sndfile.h>
 #include <complex>
-#include "cnpy.h"
-#include "model.h"
+
+#include "ssl_content.h"
+
 
 #include "text_preprocessor.h"
 
@@ -26,29 +27,6 @@ void save_audio(const std::vector<float>& audio_data, const std::string& file_pa
 
     sf_write_float(outfile, audio_data.data(), audio_data.size());
     sf_close(outfile);
-}
-
-/**
- * Load the SSL content from the ssl_content.npy file
- */
-void load_ssl_content(std::vector<std::vector<std::vector<float>>>& ssl_content) {
-    const cnpy::NpyArray ssl_content_numpy { cnpy::npy_load("ssl_content.npy") };
-    assert(ssl_content_numpy.word_size == sizeof(float));
-
-    const float* ssl_content_data = ssl_content_numpy.data<float>();
-
-    // fill ssl_content from loaded_data
-    for (size_t i = 0; i < ssl_content_numpy.shape[0]; ++i) {
-        std::vector<std::vector<float>> ssl_content_row;
-        for (size_t j = 0; j < ssl_content_numpy.shape[1]; ++j) {
-            std::vector<float> ssl_content_col;
-            for (size_t k = 0; k < ssl_content_numpy.shape[2]; ++k) {
-                ssl_content_col.push_back(ssl_content_data[i * ssl_content_numpy.shape[1] * ssl_content_numpy.shape[2] + j * ssl_content_numpy.shape[2] + k]);
-            }
-            ssl_content_row.push_back(ssl_content_col);
-        }
-        ssl_content.push_back(ssl_content_row);
-    }
 }
 
 int main() {
@@ -85,19 +63,19 @@ int main() {
     std::vector<std::vector<std::vector<float>>> ssl_content;
     load_ssl_content(ssl_content);
 
-    const std::vector<int64_t> pred_semantic {
-        run_t2s_onnx_model(onnx_encoder_path, onnx_fsdec_path,
-            onnx_sdec_path, ref_seq, text_seq, ref_bert, text_bert, ssl_content, 0)
-    };
+    // const std::vector<int64_t> pred_semantic {
+    //     run_t2s_onnx_model(onnx_encoder_path, onnx_fsdec_path,
+    //         onnx_sdec_path, ref_seq, text_seq, ref_bert, text_bert, ssl_content, 0)
+    // };
 
-    const std::vector<float> audio_output {
-        run_vits_onnx_model(onnx_model_path, text_seq, pred_semantic)
-    };
+    // const std::vector<float> audio_output {
+    //     run_vits_onnx_model(onnx_model_path, text_seq, pred_semantic)
+    // };
 
-    // Save the audio
-    const std::string output_file_path { "output.wav" };
-    save_audio(audio_output, output_file_path, 32000);
-    std::cout << "Audio saved as '" << output_file_path << "'" << std::endl;
+    // // Save the audio
+    // const std::string output_file_path { "output.wav" };
+    // save_audio(audio_output, output_file_path, 32000);
+    // std::cout << "Audio saved as '" << output_file_path << "'" << std::endl;
 
     return 0;
 }
