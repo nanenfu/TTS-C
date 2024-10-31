@@ -19,10 +19,11 @@ class Encoder {
 public:
     Encoder(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryInfo& memory_info);
     EncoderResult run(std::vector<int64_t> ref_seq,
-                std::vector<int64_t> text_seq,
-                std::vector<std::vector<float>> ref_bert,
-                std::vector<std::vector<float>> text_bert,
-                std::vector<std::vector<std::vector<float>>> ssl_content) const;
+                        std::vector<int64_t> text_seq,
+                        std::vector<std::vector<float>> ref_bert,
+                        std::vector<std::vector<float>> text_bert,
+                        std::vector<float> ssl_content,
+                        std::vector<int64_t> ssl_content_shape) const;
 private:
     Ort::MemoryInfo& memory_info;
     std::unique_ptr<Ort::Session> session;

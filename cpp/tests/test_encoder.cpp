@@ -28,11 +28,10 @@ TEST_CASE("run should run inference", "[Encoder]") {
     const std::vector<std::vector<float>> ref_bert(ref_seq.size(), std::vector<float>(1024, 0.0f));
     const std::vector<std::vector<float>> text_bert(text_seq.size(), std::vector<float>(1024, 0.0f));
 
-    std::vector<std::vector<std::vector<float>>> ssl_content;
-    load_ssl_content(ssl_content);
+    auto [ssl_content, ssl_content_shape] = load_ssl_content();
 
     EncoderResult encoder_result {
-        encoder.run(ref_seq, text_seq, ref_bert, text_bert, ssl_content)
+        encoder.run(ref_seq, text_seq, ref_bert, text_bert, ssl_content, ssl_content_shape)
     };
 
     REQUIRE(encoder_result.x.size() == 61440);

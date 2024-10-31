@@ -24,7 +24,8 @@ EncoderResult Encoder::run(std::vector<int64_t> ref_seq,
                     std::vector<int64_t> text_seq,
                     std::vector<std::vector<float>> ref_bert,
                     std::vector<std::vector<float>> text_bert,
-                    std::vector<std::vector<std::vector<float>>> ssl_content) const
+                    std::vector<float> ssl_content,
+                    std::vector<int64_t> ssl_content_shape) const
 {
     std::vector<int64_t> input_dims1 { 1, static_cast<int64_t>(ref_seq.size()) };
     Ort::Value input_tensor1 {
@@ -62,15 +63,11 @@ EncoderResult Encoder::run(std::vector<int64_t> ref_seq,
     };
 
 
-    std::vector<int64_t> input_dims5 {
-        1,
-        static_cast<int64_t>(ssl_content[0].size()),
-        static_cast<int64_t>(ssl_content[0][0].size())
-    };
-    std::vector<float> ssl_content_flattened_data { flatten(ssl_content) };
+    std::vector<int64_t> input_dims5 { ssl_content_shape };
     Ort::Value input_tensor5 {
-        Ort::Value::CreateTensor<float>(memory_info, ssl_content_flattened_data.data(),
-            ssl_content_flattened_data.size(), input_dims5.data(), input_dims5.size())
+        Ort::Value::CreateTensor<float>(memory_info,
+                                        ssl_content.data(), ssl_content.size(),
+                                        input_dims5.data(), input_dims5.size())
     };
 
     print_dims("Input ref_seq", input_dims1);

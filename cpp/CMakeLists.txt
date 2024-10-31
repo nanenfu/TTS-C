@@ -50,6 +50,7 @@ add_executable(tests
                 tests/test_string_utils.cpp
                 tests/test_nlp.cpp
                 tests/test_encoder.cpp
+                tests/test_ssl_content.cpp
 )
 
 target_link_libraries(tests

@@ -66,16 +66,30 @@ int main() {
     const std::vector<std::vector<float>> ref_bert(ref_seq.size(), std::vector<float>(1024, 0.0f));
     const std::vector<std::vector<float>> text_bert(text_seq.size(), std::vector<float>(1024, 0.0f));
 
-    std::vector<std::vector<std::vector<float>>> ssl_content;
-    load_ssl_content(ssl_content);
+    auto [ssl_conent, ssl_content_shape] = load_ssl_content();
 
     Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "test");
+
     auto memory_info { Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault) };
 
     Encoder encoder(onnx_encoder_path, env, memory_info);
     EncoderResult encoder_result {
-        encoder.run(ref_seq, text_seq, ref_bert, text_bert, ssl_content)
+        encoder.run(ref_seq, text_seq, ref_bert, text_bert, ssl_conent, ssl_content_shape)
     };
+
+    // print encoder_result.prompts
+    std::cout << "encoder_result.prompts = ";
+    for (int i : encoder_result.prompts) {
+        std::cout << i << " ";
+    }
+    std::cout << std::endl;
+
+    // print encoder_result.x
+    std::cout << "encoder_result.x = ";
+    for (float i : encoder_result.x) {
+        std::cout << i << " ";
+    }
+    std::cout << std::endl;
 
     FSDecoder fsdecoder(onnx_fsdec_path, env, memory_info);
     FSDecoderResult fsdecoder_result {
