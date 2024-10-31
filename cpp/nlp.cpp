@@ -82,6 +82,17 @@ namespace NLP {
                 continue;
             }
 
+            // handling special characters
+            if (token == "$") {
+                phones.push_back("SP2");
+                continue;
+            }
+
+            if (token == "^") {
+                phones.push_back("SP3");
+                continue;
+            }
+
             // token is in the punctuation list
             if (std::find(punctuation.begin(), punctuation.end(), token) != punctuation.end()) {
                 phones.push_back(token);
@@ -96,7 +107,7 @@ namespace NLP {
                     }
                 }
             } else {
-                std::cout << "No phonetic transcription for " << token << std::endl;
+                std::cerr << "No phonetic transcription for " << token << std::endl;
             }
         }
 

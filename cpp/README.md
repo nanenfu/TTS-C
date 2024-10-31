@@ -43,4 +43,4 @@ cpplint *.cpp *.h
 
 - [ ] Implement NLP::seg_text in text_preprocessor.cpp to segment different language segments
 - [ ] NLP::g2p doesn't use the g2p model to detect phones that are not in the g2p_en_dict.json
-- [ ] TextPreprocessor::extract_features should handle special silence symbols as in text/cleaner.py
+- [ ] Split preprocessor and tokenizer into two different classes
