@@ -5,17 +5,19 @@
 #include <string>
 #include <sndfile.h>
 #include <complex>
+#include <iomanip>
+
+#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 
 #include "ssl_content.h"
 
+#include "text_preprocessor.h"
+
+// models
 #include "encoder.h"
 #include "fsdecoder.h"
 #include "ssdecoder.h"
 #include "vits.h"
-
-#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
-
-#include "text_preprocessor.h"
 
 // Adapted from the Enfu's code
 void save_audio(const std::vector<float>& audio_data, const std::string& file_path, int sample_rate) {
@@ -48,13 +50,7 @@ int main() {
     const std::string lang { "en" };
     const std::string text_split_method { "cut4" };
     TextPreprocessor text_preprocessor;
-    std::vector<int64_t> text_seq = text_preprocessor.preprocess(text, lang, text_split_method);
-    // print text_seq
-    std::cout << "text_seq = ";
-    for (int i : text_seq) {
-        std::cout << i << " ";
-    }
-    std::cout << std::endl;
+    std::vector<int64_t> text_seq { text_preprocessor.preprocess(text, lang, text_split_method) };
 
     const std::vector<int64_t> ref_seq {
             10, 64, 26, 75, 42, 1, 64, 68, 1, 64, 68, 1, 55, 80, 75, 68, 61, 42,
@@ -77,24 +73,16 @@ int main() {
         encoder.run(ref_seq, text_seq, ref_bert, text_bert, ssl_conent, ssl_content_shape)
     };
 
-    // print encoder_result.prompts
-    std::cout << "encoder_result.prompts = ";
-    for (int i : encoder_result.prompts) {
-        std::cout << i << " ";
-    }
-    std::cout << std::endl;
-
-    // print encoder_result.x
-    std::cout << "encoder_result.x = ";
-    for (float i : encoder_result.x) {
-        std::cout << i << " ";
-    }
-    std::cout << std::endl;
-
     FSDecoder fsdecoder(onnx_fsdec_path, env, memory_info);
     FSDecoderResult fsdecoder_result {
         fsdecoder.run(encoder_result)
     };
+
+    // std::cout << "fsdecoder_result.k = ";
+    // for (auto value : fsdecoder_result.k) {
+    //     std::cout << std::fixed << std::setprecision(6) << value << " ";
+    // }
+    // std::cout << std::endl;
 
     const int early_stop_num = 2700;
     const int prefix_len = encoder_result.prompts_shape[1];

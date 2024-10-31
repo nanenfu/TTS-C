@@ -19,9 +19,9 @@ git checkout v1.19.2 # or the version you want to use
 
 2. Compile the TTS library
 ```bash
-mkdir build
-cd build
-cmake ..
+mkdir build/Debug
+cd build/Debug
+cmake -DCMAKE_BUILD_TYPE=Debug ../..
 make
 ./tts_cpp
 ```
@@ -43,4 +43,11 @@ cpplint *.cpp *.h
 
 - [ ] Implement NLP::seg_text in text_preprocessor.cpp to segment different language segments
 - [ ] NLP::g2p doesn't use the g2p model to detect phones that are not in the g2p_en_dict.json
-- [ ] Split preprocessor and tokenizer into two different classes
+- [ ] [Refactoring] Split preprocessor and tokenizer into two different classes
+
+## Release
+
+```bash
+mkdir -p build/Release
+cd build/Release
+cmake -DCMAKE_BUILD_TYPE=Release ../..
