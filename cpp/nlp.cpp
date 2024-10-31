@@ -9,6 +9,7 @@
 #include <regex>
 
 #include "nlp.h"
+#include "symbols.h"
 #include "string_utils.h"
 
 namespace NLP {
@@ -71,6 +72,21 @@ namespace NLP {
         for (auto& token : tokens) {
             // upper case
             std::transform(token.begin(), token.end(), token.begin(), ::toupper);
+
+            if (token.empty()) {
+                continue;
+            }
+
+            // check for whitespace
+            if (StringUtils::is_empty(token)) {
+                continue;
+            }
+
+            // token is in the punctuation list
+            if (std::find(punctuation.begin(), punctuation.end(), token) != punctuation.end()) {
+                phones.push_back(token);
+                continue;
+            }
 
             if (g2p_en_dict.find(token) != g2p_en_dict.end()) {
                 // copy to phones

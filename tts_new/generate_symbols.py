@@ -1,6 +1,6 @@
 # A script to generate symbols.h file for C++ implementation
 
-from text import symbols
+from text import symbols, punctuation
 
 # save to json
 with open('symbols.h', 'w') as f:
@@ -14,8 +14,15 @@ with open('symbols.h', 'w') as f:
     f.write("#include <string>\n\n\n")
 
     f.write("namespace NLP {\n")
-    f.write("\t std::vector<std::string> symbols {")
+
+    f.write("\tconst std::vector<std::string> punctuation {")
+    for punct in punctuation:
+        f.write("\"" + punct + "\",")
+    f.write("};\n")
+
+    f.write("\tconst std::vector<std::string> symbols {")
     for symbol in symbols:
         f.write("\"" + symbol + "\",")
     f.write("};\n")
+
     f.write("}\n")
