@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <memory>
 
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 

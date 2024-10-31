@@ -2,6 +2,7 @@
 #include <cassert>
 #include <tuple>
 #include <utility>
+#include <iostream>
 
 #include "cnpy.h"
 

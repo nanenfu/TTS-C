@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 

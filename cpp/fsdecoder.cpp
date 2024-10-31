@@ -1,28 +1,34 @@
+/**
+ * @file fsdecoder.cpp
+ * 
+ * @brief Implementation of the FSDecoder (First Stage Decoder) class
+ */
+#include "fsdecoder.h"
+
 #include <iostream>
 #include <tuple>
 #include <memory>
-#include <tuple>
 #include <cassert>
+#include <string>
+#include <vector>
+#include <utility>
 
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 
 #include "encoder.h"
-#include "fsdecoder.h"
 #include "onnx_utils.h"
 
 FSDecoder::FSDecoder(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryInfo& _memory_info)
-                    : memory_info(_memory_info)
-{
+                    : memory_info(_memory_info) {
     std::cout << "Loading ONNX models from " << onnx_model_path << std::endl;
-    Ort::SessionOptions encoder_session_options;
-    session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), encoder_session_options);
+    Ort::SessionOptions session_options;
+    session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), session_options);
 
     std::cout << "Encoder model info: " << std::endl;
     display_model_info(*session);
 }
 
-FSDecoderResult FSDecoder::run(EncoderResult& encoder_result) const
-{
+FSDecoderResult FSDecoder::run(EncoderResult& encoder_result) const {
     Ort::Value input_tensor1 {
         Ort::Value::CreateTensor<float>(memory_info, encoder_result.x.data(), encoder_result.x.size(),
             encoder_result.x_shape.data(), encoder_result.x_shape.size())

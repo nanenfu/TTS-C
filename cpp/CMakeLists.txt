@@ -7,7 +7,16 @@ set(CMAKE_CXX_STANDARD 20)
 # Set ONNX Runtime paths
 set(ONNXRUNTIME_DIR "../../onnxruntime")
 include_directories(${ONNXRUNTIME_DIR}/include)
-link_directories(${ONNXRUNTIME_DIR}/build/MacOS/RelWithDebInfo)
+
+# if CMAKE_BUILD_TYPE is Release, use the Release build of ONNX Runtime
+# if CMAKE_BUILD_TYPE is Debug, use the Debug build of ONNX Runtime
+# if CMAKE_BUILD_TYPE is not set, use the RelWithDebInfo build of ONNX Runtime
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
+
+
+link_directories(${ONNXRUNTIME_DIR}/build/MacOS/${CMAKE_BUILD_TYPE})
 
 include(FetchContent)
 

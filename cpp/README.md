@@ -19,23 +19,22 @@ git checkout v1.19.2 # or the version you want to use
 
 2. Compile the TTS library
 ```bash
-mkdir build/Debug
-cd build/Debug
-cmake -DCMAKE_BUILD_TYPE=Debug ../..
+mkdir -p build/RelWithDebInfo
+cd build/RelWithDebInfo
+cmake ../..
 make
 ./tts_cpp
 ```
 
 3. Run tests
 ```bash
-cd build
-ctest
+cd build/RelWithDebInfo
+ctest # or ./tests -V for verbose output
 ```
 
 ## Linter
 
 ```bash
-cppcheck -x c++ --enable=all --inconclusive --library=posix text_utils.cpp
 cpplint *.cpp *.h
 ```
 
@@ -46,6 +45,12 @@ cpplint *.cpp *.h
 - [ ] [Refactoring] Split preprocessor and tokenizer into two different classes
 
 ## Release
+
+Compile onnxruntime in a Release mode:
+```bash
+./build.sh --config Release --build_shared_lib --parallel --compile_no_warning_as_error --skip_submodule_sync --cmake_extra_defines CMAKE_OSX_ARCHITECTURES=arm64
+```
+
 
 ```bash
 mkdir -p build/Release

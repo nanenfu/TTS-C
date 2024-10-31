@@ -1,20 +1,27 @@
-#include <iostream>
-#include <tuple>
-#include <memory>
-#include <tuple>
+/**
+ * @file encoder.cpp
+ * 
+ * @brief Encoder class implementation.
+ */
+#include "encoder.h"
+
 #include <cassert>
 
-#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
+#include <iostream>
+#include <memory>
+#include <tuple>
+#include <string>
+#include <vector>
+#include <utility>
 
-#include "encoder.h"
+#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 #include "onnx_utils.h"
 
 Encoder::Encoder(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryInfo& _memory_info)
-                    : memory_info(_memory_info)
-{
+                    : memory_info(_memory_info) {
     std::cout << "Loading ONNX models from " << onnx_model_path << std::endl;
-    Ort::SessionOptions encoder_session_options;
-    session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), encoder_session_options);
+    Ort::SessionOptions session_options;
+    session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), session_options);
 
     std::cout << "Encoder model info: " << std::endl;
     display_model_info(*session);
@@ -25,8 +32,7 @@ EncoderResult Encoder::run(std::vector<int64_t> ref_seq,
                     std::vector<std::vector<float>> ref_bert,
                     std::vector<std::vector<float>> text_bert,
                     std::vector<float> ssl_content,
-                    std::vector<int64_t> ssl_content_shape) const
-{
+                    std::vector<int64_t> ssl_content_shape) const {
     std::vector<int64_t> input_dims1 { 1, static_cast<int64_t>(ref_seq.size()) };
     Ort::Value input_tensor1 {
         Ort::Value::CreateTensor<int64_t>(memory_info, ref_seq.data(), ref_seq.size(),

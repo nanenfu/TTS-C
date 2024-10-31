@@ -1,7 +1,9 @@
+#include <cassert>
 #include <iostream>
 #include <vector>
 #include <string>
-#include <cassert>
+#include <memory>
+#include <utility>
 
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 
@@ -12,8 +14,8 @@ SSDecoder::SSDecoder(const std::string& onnx_model_path, Ort::Env& env, Ort::Mem
                     : memory_info(_memory_info)
 {
     std::cout << "Loading ONNX models from " << onnx_model_path << std::endl;
-    Ort::SessionOptions encoder_session_options;
-    session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), encoder_session_options);
+    Ort::SessionOptions session_options;
+    session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), session_options);
 
     std::cout << "SSDecoder model info: " << std::endl;
     display_model_info(*session);
@@ -21,20 +23,20 @@ SSDecoder::SSDecoder(const std::string& onnx_model_path, Ort::Env& env, Ort::Mem
 
 std::vector<int64_t> SSDecoder::run(FSDecoderResult& fsdecoder_result, int early_stop_num, int prefix_len) const
 {
-    std::vector<int64_t> iy = fsdecoder_result.y;
-    std::vector<int64_t> iy_shape = fsdecoder_result.y_shape;
+    std::vector<int64_t> iy { fsdecoder_result.y };
+    std::vector<int64_t> iy_shape { fsdecoder_result.y_shape };
 
-    std::vector<float> ik = fsdecoder_result.k;
-    std::vector<int64_t> ik_shape = fsdecoder_result.k_shape;
+    std::vector<float> ik { fsdecoder_result.k };
+    std::vector<int64_t> ik_shape { fsdecoder_result.k_shape };
 
-    std::vector<float> iv = fsdecoder_result.v;
-    std::vector<int64_t> iv_shape = fsdecoder_result.v_shape;
+    std::vector<float> iv { fsdecoder_result.v };
+    std::vector<int64_t> iv_shape { fsdecoder_result.v_shape };
 
-    std::vector<float> iy_emb = fsdecoder_result.y_emb;
-    std::vector<int64_t> iy_emb_shape = fsdecoder_result.y_emb_shape;
+    std::vector<float> iy_emb { fsdecoder_result.y_emb };
+    std::vector<int64_t> iy_emb_shape { fsdecoder_result.y_emb_shape };
 
-    std::vector<float> ix_example = fsdecoder_result.x_example;
-    std::vector<int64_t> ix_example_shape = fsdecoder_result.x_example_shape;
+    std::vector<float> ix_example { fsdecoder_result.x_example };
+    std::vector<int64_t> ix_example_shape { fsdecoder_result.x_example_shape };
 
     std::vector<float> logits;
     std::vector<int32_t> samples;
@@ -47,6 +49,9 @@ std::vector<int64_t> SSDecoder::run(FSDecoderResult& fsdecoder_result, int early
 
     std::vector<const char*> input_names {"iy", "ik", "iv", "iy_emb", "ix_example"};
     std::vector<const char*> output_names { "y", "k", "v", "y_emb", "logits", "samples" };
+
+    std::cout << "Running second stage decoder..." << std::endl;
+
     int idx = 1;
     for (; idx < 1500; ++idx) {
         Ort::Value input_tensor1 {
@@ -77,8 +82,8 @@ std::vector<int64_t> SSDecoder::run(FSDecoderResult& fsdecoder_result, int early
         inputs.push_back(std::move(input_tensor5));
 
         auto outputs = session->Run(Ort::RunOptions{nullptr},
-                                            input_names.data(), inputs.data(), inputs.size(),
-                                            output_names.data(), output_names.size());
+                                        input_names.data(), inputs.data(), inputs.size(),
+                                        output_names.data(), output_names.size());
 
         iy_shape = outputs[0].GetTensorTypeAndShapeInfo().GetShape();
         size_t y_data_size = outputs[0].GetTensorTypeAndShapeInfo().GetElementCount();
@@ -100,12 +105,13 @@ std::vector<int64_t> SSDecoder::run(FSDecoderResult& fsdecoder_result, int early
         float* y_emb_data = outputs[3].GetTensorMutableData<float>();
         iy_emb = std::vector<float>(y_emb_data, y_emb_data + y_emb_size);
 
-
+        // Early stopping conditions
         if (early_stop_num != -1 && (iy_shape[1] - prefix_len) > early_stop_num) {
             std::cout << "early_stop_num != -1 && (iy_shape[1] - prefix_len)  > early_stop_num" << std::endl;
             break;
         }
 
+        // Get samples and logits as they are needed for determining stopping conditions
         size_t samples_data_size = outputs[5].GetTensorTypeAndShapeInfo().GetElementCount();
         int32_t* samples_data = outputs[5].GetTensorMutableData<int32_t>();
         samples = std::vector<int32_t>(samples_data, samples_data + samples_data_size);
@@ -119,6 +125,7 @@ std::vector<int64_t> SSDecoder::run(FSDecoderResult& fsdecoder_result, int early
         float* logits_data = outputs[4].GetTensorMutableData<float>();
         logits = std::vector<float>(logits_data, logits_data + logits_size);
 
+        // np.argmax(logits, axis=-1)[0] == 1024
         auto max_it = std::max_element(logits.begin(), logits.end());
         int max_idx = std::distance(logits.begin(), max_it);
         if (max_idx == 1024) {
@@ -128,9 +135,10 @@ std::vector<int64_t> SSDecoder::run(FSDecoderResult& fsdecoder_result, int early
     }
 
     std::cout << "stop at " << idx << std::endl;
+    std::cout << "Second stage decoder run successfully" << std::endl;
 
-    iy[iy.size() - 1] = 0;
     // Perform slicing
+    iy[iy.size() - 1] = 0;
     std::vector<int64_t> y_sliced(iy.begin() + iy.size() - idx, iy.end());
     std::cout << "Final y shape after stopping and slicing: " << y_sliced.size() << std::endl;
 

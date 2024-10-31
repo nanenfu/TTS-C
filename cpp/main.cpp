@@ -1,17 +1,22 @@
+/**
+ * This is an entry point for ./tts_cpp CLI command.
+ */
 #include <vector>
 #include <iostream>
 #include <utility>
 #include <map>
 #include <string>
-#include <sndfile.h>
 #include <complex>
 #include <iomanip>
 
+#include <sndfile.h>
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 
-#include "ssl_content.h"
-
+// preprocessor and tokenizer
 #include "text_preprocessor.h"
+
+// data from ssl_content.npy
+#include "ssl_content.h"
 
 // models
 #include "encoder.h"
