@@ -7,15 +7,15 @@
 #include "encoder.h"
 
 struct FSDecoderResult {
-    std::vector<float> y;
+    std::vector<int64_t > y;
     std::vector<int64_t> y_shape;
-    std::vector<int64_t> k;
+    std::vector<float> k;
     std::vector<int64_t> k_shape;
-    std::vector<int64_t> v;
+    std::vector<float> v;
     std::vector<int64_t> v_shape;
-    std::vector<int64_t> y_emb;
+    std::vector<float> y_emb;
     std::vector<int64_t> y_emb_shape;
-    std::vector<int64_t> x_example;
+    std::vector<float> x_example;
     std::vector<int64_t> x_example_shape;
 };
 

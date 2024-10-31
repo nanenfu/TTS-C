@@ -83,9 +83,10 @@ int main() {
     };
 
     const int early_stop_num = 2700;
+    const int prefix_len = encoder_result.prompts_shape[1];
     SSDecoder ssdecoder(onnx_sdec_path, env, memory_info);
     const std::vector<int64_t> pred_semantic {
-        ssdecoder.run(fsdecoder_result, early_stop_num)
+        ssdecoder.run(fsdecoder_result, early_stop_num, prefix_len)
     };
 
     Vits vits(onnx_model_path, env, memory_info);

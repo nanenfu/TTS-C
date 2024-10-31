@@ -55,36 +55,36 @@ FSDecoderResult FSDecoder::run(EncoderResult& encoder_result) const
     print_dims("Output y", fsdecoder_result.y_shape);
     assert(outputs[0].GetTensorTypeAndShapeInfo().GetElementType() == ONNX_TENSOR_ELEMENT_DATA_TYPE_INT64);
     size_t y_data_size = outputs[0].GetTensorTypeAndShapeInfo().GetElementCount();
-    float* y_data = outputs[0].GetTensorMutableData<float>();
-    fsdecoder_result.y = std::vector<float>(y_data, y_data + y_data_size);
+    int64_t* y_data = outputs[0].GetTensorMutableData<int64_t>();
+    fsdecoder_result.y = std::vector<int64_t>(y_data, y_data + y_data_size);
 
     fsdecoder_result.k_shape = outputs[1].GetTensorTypeAndShapeInfo().GetShape();
     print_dims("Output k", fsdecoder_result.k_shape);
     assert(outputs[1].GetTensorTypeAndShapeInfo().GetElementType() == ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT);
     size_t k_data_size = outputs[1].GetTensorTypeAndShapeInfo().GetElementCount();
-    int64_t* k_data = outputs[1].GetTensorMutableData<int64_t>();
-    fsdecoder_result.k = std::vector<int64_t>(k_data, k_data + k_data_size);
+    float* k_data = outputs[1].GetTensorMutableData<float>();
+    fsdecoder_result.k = std::vector<float>(k_data, k_data + k_data_size);
 
     fsdecoder_result.v_shape = outputs[2].GetTensorTypeAndShapeInfo().GetShape();
     print_dims("Output v", fsdecoder_result.v_shape);
     assert(outputs[2].GetTensorTypeAndShapeInfo().GetElementType() == ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT);
     size_t v_data_size = outputs[2].GetTensorTypeAndShapeInfo().GetElementCount();
-    int64_t* v_data = outputs[2].GetTensorMutableData<int64_t>();
-    fsdecoder_result.v = std::vector<int64_t>(v_data, v_data + v_data_size);
+    float* v_data = outputs[2].GetTensorMutableData<float>();
+    fsdecoder_result.v = std::vector<float>(v_data, v_data + v_data_size);
 
     fsdecoder_result.y_emb_shape = outputs[3].GetTensorTypeAndShapeInfo().GetShape();
     print_dims("Output y_emb", fsdecoder_result.y_emb_shape);
     assert(outputs[3].GetTensorTypeAndShapeInfo().GetElementType() == ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT);
     size_t y_emb_data_size = outputs[3].GetTensorTypeAndShapeInfo().GetElementCount();
-    int64_t* y_emb_data = outputs[3].GetTensorMutableData<int64_t>();
-    fsdecoder_result.y_emb = std::vector<int64_t>(y_emb_data, y_emb_data + y_emb_data_size);
+    float* y_emb_data = outputs[3].GetTensorMutableData<float>();
+    fsdecoder_result.y_emb = std::vector<float>(y_emb_data, y_emb_data + y_emb_data_size);
 
     fsdecoder_result.x_example_shape = outputs[4].GetTensorTypeAndShapeInfo().GetShape();
     print_dims("Output x_example", fsdecoder_result.x_example_shape);
     assert(outputs[4].GetTensorTypeAndShapeInfo().GetElementType() == ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT);
     size_t x_example_data_size = outputs[4].GetTensorTypeAndShapeInfo().GetElementCount();
-    int64_t* x_example_data = outputs[4].GetTensorMutableData<int64_t>();
-    fsdecoder_result.x_example = std::vector<int64_t>(x_example_data, x_example_data + x_example_data_size);
+    float* x_example_data = outputs[4].GetTensorMutableData<float>();
+    fsdecoder_result.x_example = std::vector<float>(x_example_data, x_example_data + x_example_data_size);
 
     return std::move(fsdecoder_result);
 }
