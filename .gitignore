@@ -166,3 +166,7 @@ cython_debug/
 
 # VS Code files
 .vscode
+
+# Swift PM files
+.build/
+.swiftpm/

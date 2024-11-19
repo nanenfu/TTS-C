@@ -18,11 +18,8 @@
 // data from ssl_content.npy
 #include "ssl_content.h"
 
-// models
-#include "encoder.h"
-#include "fsdecoder.h"
-#include "ssdecoder.h"
-#include "vits.h"
+// TTS Engine
+#include "tts_engine.h"
 
 // Adapted from the Enfu's code
 void save_audio(const std::vector<float>& audio_data, const std::string& file_path, int sample_rate) {
@@ -49,6 +46,7 @@ int main() {
     const std::string onnx_fsdec_path { "onnx/" + project_name + "/" + project_name + "_t2s_fsdec.onnx" };
     const std::string onnx_sdec_path { "onnx/" + project_name + "/" + project_name + "_t2s_sdec.onnx" };
     const std::string onnx_model_path { "onnx/" + project_name + "/test3_vits.onnx" };
+    const std::string ssl_content_path { "ssl_content.npy" };
 
     // Step 1: Use the TextPreprocessor class to get text_seq
     const std::string text { "just the two of us, we can make it if we try" };
@@ -64,43 +62,9 @@ int main() {
             50, 1, 91, 13, 80, 22, 62, 26, 88, 55, 93, 22, 62, 60, 13, 75, 80, 80, 16,
             61, 80, 88, 10, 64, 7, 26, 57, 12, 64, 75, 63, 35, 63, 24, 38, 3
     };
-    const std::vector<std::vector<float>> ref_bert(ref_seq.size(), std::vector<float>(1024, 0.0f));
-    const std::vector<std::vector<float>> text_bert(text_seq.size(), std::vector<float>(1024, 0.0f));
 
-    auto [ssl_conent, ssl_content_shape] = load_ssl_content();
-
-    Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "test");
-
-    auto memory_info { Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault) };
-
-    Encoder encoder(onnx_encoder_path, env, memory_info);
-    EncoderResult encoder_result {
-        encoder.run(ref_seq, text_seq, ref_bert, text_bert, ssl_conent, ssl_content_shape)
-    };
-
-    FSDecoder fsdecoder(onnx_fsdec_path, env, memory_info);
-    FSDecoderResult fsdecoder_result {
-        fsdecoder.run(encoder_result)
-    };
-
-    // std::cout << "fsdecoder_result.k = ";
-    // for (auto value : fsdecoder_result.k) {
-    //     std::cout << std::fixed << std::setprecision(6) << value << " ";
-    // }
-    // std::cout << std::endl;
-
-    const int early_stop_num = 2700;
-    const int prefix_len = encoder_result.prompts_shape[1];
-    SSDecoder ssdecoder(onnx_sdec_path, env, memory_info);
-    const std::vector<int64_t> pred_semantic {
-        ssdecoder.run(fsdecoder_result, early_stop_num, prefix_len)
-    };
-
-    Vits vits(onnx_model_path, env, memory_info);
-
-    const std::vector<float> audio_output {
-        vits.run(text_seq, pred_semantic)
-    };
+    TTSEngine tts_engine(onnx_encoder_path, onnx_fsdec_path, onnx_sdec_path, onnx_model_path, ssl_content_path);
+    const std::vector<float> audio_output = tts_engine.generate_audio(text_seq, ref_seq);
 
     // Save the audio
     const std::string output_file_path { "output.wav" };

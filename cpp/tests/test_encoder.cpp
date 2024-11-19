@@ -28,7 +28,8 @@ TEST_CASE("run should run inference", "[Encoder]") {
     const std::vector<std::vector<float>> ref_bert(ref_seq.size(), std::vector<float>(1024, 0.0f));
     const std::vector<std::vector<float>> text_bert(text_seq.size(), std::vector<float>(1024, 0.0f));
 
-    auto [ssl_content, ssl_content_shape] = load_ssl_content();
+    const std::string ssl_content_path { "ssl_content.npy" };
+    auto [ssl_content, ssl_content_shape] = load_ssl_content(ssl_content_path);
 
     EncoderResult encoder_result {
         encoder.run(ref_seq, text_seq, ref_bert, text_bert, ssl_content, ssl_content_shape)

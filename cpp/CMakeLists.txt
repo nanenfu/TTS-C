@@ -46,6 +46,7 @@ find_package(SndFile REQUIRED)
 
 # Tests
 add_executable(tests
+                tts_engine.cpp
                 vits.cpp
                 encoder.cpp
                 fsdecoder.cpp
@@ -81,6 +82,7 @@ catch_discover_tests(tests)
 
 # Main executable
 add_executable( tts_cpp
+                tts_engine.cpp
                 vits.cpp
                 encoder.cpp
                 fsdecoder.cpp
