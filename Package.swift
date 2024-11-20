@@ -19,7 +19,9 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "SealTTS",
-            dependencies: ["onnxruntime-swift-package-manager"],
+            dependencies: [
+                .product(name: "onnxruntime", package: "onnxruntime-swift-package-manager")
+            ],
             path: "cpp",
             sources: ["encoder.cpp", "fsdecoder.cpp", "nlp.cpp", "onnx_utils.cpp", "ssdecoder.cpp", "ssl_content.cpp",
                         "string_utils.cpp", "text_preprocessor.cpp", "tts_engine.cpp", "vits.cpp"],
