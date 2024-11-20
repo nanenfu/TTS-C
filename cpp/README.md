@@ -58,3 +58,10 @@ cd build/Release
 cmake -DCMAKE_BUILD_TYPE=Release ../..
 make
 ```
+
+```bash
+mkdir -p build/Debug
+cd build/Debug
+cmake -DCMAKE_BUILD_TYPE=Debug ../..
+make
+```

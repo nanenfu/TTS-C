@@ -16,7 +16,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 
-link_directories(${ONNXRUNTIME_DIR}/build/MacOS/${CMAKE_BUILD_TYPE})
+link_directories(${ONNXRUNTIME_DIR}/build/MacOS/RelWithDebInfo)
 
 include(FetchContent)
 
@@ -96,6 +96,7 @@ add_executable( tts_cpp
 
 )
 
+
 target_link_libraries(tts_cpp
                     PRIVATE
                         cnpy
@@ -105,6 +106,30 @@ target_link_libraries(tts_cpp
                     )
 
 target_include_directories(tts_cpp PRIVATE ${cnpy_SOURCE_DIR})
+
+# Library
+add_library(  sealtts SHARED
+              tts_engine.cpp
+              vits.cpp
+              encoder.cpp
+              fsdecoder.cpp
+              ssdecoder.cpp
+              string_utils.cpp
+              onnx_utils.cpp
+              nlp.cpp
+              text_preprocessor.cpp
+              ssl_content.cpp
+)
+
+target_link_libraries(sealtts
+                    PRIVATE
+                        cnpy
+                        onnxruntime
+                        SndFile::sndfile
+                        nlohmann_json::nlohmann_json
+                    )
+
+target_include_directories(sealtts PRIVATE ${cnpy_SOURCE_DIR})
 
 # Additional files
 file(COPY onnx/ DESTINATION onnx)

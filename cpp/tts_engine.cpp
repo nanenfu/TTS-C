@@ -1,6 +1,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <iostream>
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 
 #include "ssl_content.h"
@@ -11,11 +12,18 @@
 
 #include "tts_engine.h"
 
-TTSEngine::TTSEngine(const std::string& onnx_encoder_path,
-                const std::string& onnx_fsdec_path,
-                const std::string& onnx_sdec_path,
-                const std::string& onnx_model_path,
-                const std::string& ssl_content_path) {
+TTSEngine::TTSEngine(const std::string onnx_encoder_path,
+                const std::string onnx_fsdec_path,
+                const std::string onnx_sdec_path,
+                const std::string onnx_model_path,
+                const std::string ssl_content_path) {
+
+    std::cout << "Initializing TTS Engine with the following options:" << std::endl;
+    std::cout << "Encoder ONNX Model Path: " << onnx_encoder_path << std::endl;
+    std::cout << "FSDecoder ONNX Model Path: " << onnx_fsdec_path << std::endl;
+    std::cout << "SSDecoder ONNX Model Path: " << onnx_sdec_path << std::endl;
+    std::cout << "Vits ONNX Model Path: " << onnx_model_path << std::endl;
+    std::cout << "SSL Content Path: " << ssl_content_path << std::endl;
 
     auto [ssl_conent, ssl_content_shape] = load_ssl_content(ssl_content_path);
     this->ssl_conent = ssl_conent;
