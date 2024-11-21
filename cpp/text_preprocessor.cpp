@@ -14,6 +14,8 @@
 #include "symbols.h"
 #include "text_preprocessor.h"
 
+TextPreprocessor::TextPreprocessor(const std::string g2p_dict_file) : g2p(g2p_dict_file) {}
+
 std::vector<int64_t> TextPreprocessor::preprocess(const std::string& text, const std::string& lang, const std::string& text_split_method) {
     std::vector<std::string> texts = pre_seg_text(text, lang, text_split_method);
 
@@ -97,15 +99,20 @@ TextPreprocessor::extract_features(const std::vector<std::string>& textlist, con
         std::string lang = langlist[i];
 
         NLP::normalize_text(text, lang);
-        std::vector<std::string> phones = NLP::g2p(text, lang);
+        std::vector<std::string> tokens = NLP::tokenize(text.data());
+        std::vector<std::string> phones;
+        for (auto& token : tokens) {
+            std::vector<std::string> new_phones = g2p.translate(token, lang);
+            phones.insert(phones.end(), new_phones.begin(), new_phones.end());
+        }
 
         norm_text_list.push_back(text);
 
         // get index of each phone from NLP::symbols list
         for (const auto& phone : phones) {
-            auto it = std::find(NLP::symbols.begin(), NLP::symbols.end(), phone);
-            if (it != NLP::symbols.end()) {
-                phones_list.push_back(std::distance(NLP::symbols.begin(), it));
+            auto it = std::find(Symbols::symbols.begin(), Symbols::symbols.end(), phone);
+            if (it != Symbols::symbols.end()) {
+                phones_list.push_back(std::distance(Symbols::symbols.begin(), it));
             } else {
                 assert(false);
             }

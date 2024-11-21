@@ -21,6 +21,8 @@ std::string text  { "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
                     "Maecenas condimentum libero ac nibh tincidunt, consectetur cursus justo hendrerit.\n"
                     "Phasellus bibendum odio in augue pulvinar, non blandit est ultrices. Duis commodo ve lectus nec dignissim.\n" };
 
+TextPreprocessor text_preprocessor("g2p_en_dict.json");
+
 TEST_CASE("pre_seg_text", "[TextPreprocessor]") {
     std::vector<std::string> result = TextPreprocessor::pre_seg_text(text, lang, text_split_method);
 
@@ -50,7 +52,7 @@ TEST_CASE("pre_seg_text", "[TextPreprocessor]") {
     REQUIRE(result == expected_result);
 
     text = "Hi. Second sentence.";
-    result = TextPreprocessor::pre_seg_text(text, lang, text_split_method);
+    result = text_preprocessor.pre_seg_text(text, lang, text_split_method);
     expected_result = { "Hi  Second sentence." };
 
     REQUIRE(result == expected_result);
@@ -58,7 +60,7 @@ TEST_CASE("pre_seg_text", "[TextPreprocessor]") {
 
 TEST_CASE("preprocess", "[TextPreprocessor]") {
     text = "Hello, how are you doing today?";
-    std::vector<int64_t> phones = TextPreprocessor::preprocess(text, lang, text_split_method);
+    std::vector<int64_t> phones = text_preprocessor.preprocess(text, lang, text_split_method);
 
     // display the result
     std::cout << "phones: ";

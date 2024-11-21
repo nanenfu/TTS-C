@@ -56,11 +56,13 @@ add_executable(tests
                 onnx_utils.cpp
                 nlp.cpp
                 ssl_content.cpp
+                g2p.cpp
                 tests/test_text_preprocessor.cpp
                 tests/test_string_utils.cpp
                 tests/test_nlp.cpp
                 tests/test_encoder.cpp
                 tests/test_ssl_content.cpp
+                tests/test_g2p.cpp
 )
 
 target_link_libraries(tests
@@ -92,6 +94,7 @@ add_executable( tts_cpp
                 nlp.cpp
                 text_preprocessor.cpp
                 ssl_content.cpp
+                g2p.cpp
                 main.cpp
 )
 
@@ -118,6 +121,7 @@ add_library(  sealtts SHARED
               nlp.cpp
               text_preprocessor.cpp
               ssl_content.cpp
+              g2p.cpp
 )
 
 target_link_libraries(sealtts

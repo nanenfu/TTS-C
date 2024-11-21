@@ -19,7 +19,8 @@ public:
                 const std::string onnx_fsdec_path,
                 const std::string onnx_sdec_path,
                 const std::string onnx_model_path,
-                const std::string ssl_content_path);
+                const std::string ssl_content_path,
+                const std::string g2p_dict_file);
 
     std::vector<float> generate_audio(const std::string text);
 

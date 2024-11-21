@@ -16,20 +16,24 @@ TTSEngine::TTSEngine(const std::string onnx_encoder_path,
                 const std::string onnx_fsdec_path,
                 const std::string onnx_sdec_path,
                 const std::string onnx_model_path,
-                const std::string ssl_content_path) {
+                const std::string ssl_content_path,
+                const std::string g2p_dict_file) {
 
+#ifndef NDEBUG
     std::cout << "Initializing TTS Engine with the following options:" << std::endl;
     std::cout << "Encoder ONNX Model Path: " << onnx_encoder_path << std::endl;
     std::cout << "FSDecoder ONNX Model Path: " << onnx_fsdec_path << std::endl;
     std::cout << "SSDecoder ONNX Model Path: " << onnx_sdec_path << std::endl;
     std::cout << "Vits ONNX Model Path: " << onnx_model_path << std::endl;
     std::cout << "SSL Content Path: " << ssl_content_path << std::endl;
+    std::cout << "G2P Dict File: " << g2p_dict_file << std::endl;
+#endif
 
     auto [ssl_conent, ssl_content_shape] = load_ssl_content(ssl_content_path);
     this->ssl_conent = ssl_conent;
     this->ssl_content_shape = ssl_content_shape;
 
-    preprocessor = std::make_unique<TextPreprocessor>();
+    preprocessor = std::make_unique<TextPreprocessor>(g2p_dict_file);
     env = std::make_unique<Ort::Env>(ORT_LOGGING_LEVEL_WARNING, "test");
     memory_info = std::make_unique<Ort::MemoryInfo>(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault));
 
@@ -44,6 +48,7 @@ std::vector<float> TTSEngine::generate_audio(const std::string text) {
 
     const std::string lang { "en" };
     const std::string text_split_method { "cut4" };
+
     std::cout << "Preprocessing text..." << std::endl;
     std::vector<int64_t> text_seq { preprocessor->preprocess(text, lang, text_split_method) };
     std::cout << "Preprocessing finished..." << std::endl;

@@ -44,9 +44,9 @@ int main() {
     const std::string onnx_sdec_path { "onnx/" + project_name + "/" + project_name + "_t2s_sdec.onnx" };
     const std::string onnx_model_path { "onnx/" + project_name + "/test3_vits.onnx" };
     const std::string ssl_content_path { "ssl_content.npy" };
+    const std::string g2p_dict_file { "g2p_en_dict.json" };
 
-    // Step 1: Use the TextPreprocessor class to get text_seq
-    TTSEngine tts_engine(onnx_encoder_path, onnx_fsdec_path, onnx_sdec_path, onnx_model_path, ssl_content_path);
+    TTSEngine tts_engine(onnx_encoder_path, onnx_fsdec_path, onnx_sdec_path, onnx_model_path, ssl_content_path, g2p_dict_file);
     const std::vector<float> audio_output = tts_engine.generate_audio("just the two of us, we can make it if we try");
 
     // Save the audio

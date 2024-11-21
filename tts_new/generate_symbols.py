@@ -13,7 +13,7 @@ with open('symbols.h', 'w') as f:
     f.write("#include <vector>\n")
     f.write("#include <string>\n\n\n")
 
-    f.write("namespace NLP {\n")
+    f.write("namespace Symbols {\n")
 
     f.write("\tconst std::vector<std::string> punctuation {")
     for punct in punctuation:
