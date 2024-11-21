@@ -1,0 +1,5 @@
+module TTSEngineModule {
+    header "tts_engine.h"
+
+    export *
+}

@@ -16,7 +16,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 
-link_directories(${ONNXRUNTIME_DIR}/build/MacOS/RelWithDebInfo)
+link_directories(${ONNXRUNTIME_DIR}/build/MacOS/${CMAKE_BUILD_TYPE})
 
 include(FetchContent)
 
@@ -93,7 +93,6 @@ add_executable( tts_cpp
                 text_preprocessor.cpp
                 ssl_content.cpp
                 main.cpp
-
 )
 
 
