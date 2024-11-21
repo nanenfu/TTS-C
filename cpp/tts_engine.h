@@ -6,10 +6,12 @@
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 #include <swift/bridging>
 
+#include "text_preprocessor.h"
 #include "encoder.h"
 #include "fsdecoder.h"
 #include "ssdecoder.h"
 #include "vits.h"
+
 
 class TTSEngine {
 public:
@@ -19,10 +21,10 @@ public:
                 const std::string onnx_model_path,
                 const std::string ssl_content_path);
 
-    std::vector<float> generate_audio(std::vector<int64_t> text_seq,
-                                        std::vector<int64_t> ref_seq);
+    std::vector<float> generate_audio(const std::string text);
 
 private:
+    std::unique_ptr<TextPreprocessor> preprocessor;
     std::unique_ptr<Encoder> encoder;
     std::unique_ptr<FSDecoder> fsdecoder;
     std::unique_ptr<SSDecoder> ssdecoder;
