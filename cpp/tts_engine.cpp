@@ -12,14 +12,18 @@
 
 #include "tts_engine.h"
 
-TTSEngine::TTSEngine(const std::string onnx_encoder_path,
-                const std::string onnx_fsdec_path,
-                const std::string onnx_sdec_path,
-                const std::string onnx_model_path,
+TTSEngine::TTSEngine(const std::string _onnx_encoder_path,
+                const std::string _onnx_fsdec_path,
+                const std::string _onnx_sdec_path,
+                const std::string _onnx_model_path,
                 const std::string ssl_content_path,
-                const std::string g2p_dict_file) {
+                const std::string g2p_dict_file)
+                :
+                onnx_encoder_path(_onnx_encoder_path),
+                onnx_fsdec_path(_onnx_fsdec_path),
+                onnx_sdec_path(_onnx_sdec_path),
+                onnx_model_path(_onnx_model_path) {
 
-#ifndef NDEBUG
     std::cout << "Initializing TTS Engine with the following options:" << std::endl;
     std::cout << "Encoder ONNX Model Path: " << onnx_encoder_path << std::endl;
     std::cout << "FSDecoder ONNX Model Path: " << onnx_fsdec_path << std::endl;
@@ -27,7 +31,13 @@ TTSEngine::TTSEngine(const std::string onnx_encoder_path,
     std::cout << "Vits ONNX Model Path: " << onnx_model_path << std::endl;
     std::cout << "SSL Content Path: " << ssl_content_path << std::endl;
     std::cout << "G2P Dict File: " << g2p_dict_file << std::endl;
-#endif
+
+    std::cout << "OnnxRuntime version: " << Ort::GetVersionString() << std::endl;
+    std::cout << "OnnxRuntime Build info: " << Ort::GetBuildInfoString() << std::endl;
+    std::cout << "Available Providers: " << std::endl;
+    for (const auto& provider : Ort::GetAvailableProviders()) {
+        std::cout << provider << std::endl;
+    }
 
     auto [ssl_conent, ssl_content_shape] = load_ssl_content(ssl_content_path);
     this->ssl_conent = ssl_conent;
@@ -43,8 +53,14 @@ TTSEngine::TTSEngine(const std::string onnx_encoder_path,
     vits = std::make_unique<Vits>(onnx_model_path, *env, *memory_info);
 }
 
-std::vector<float> TTSEngine::generate_audio(const std::string text) {
+std::vector<float> TTSEngine::generate_audio(const std::string text, bool reset_model) {
     std::cout << "Generating audio for the following text: " << text << std::endl;
+
+    if (reset_model) {
+        fsdecoder = std::make_unique<FSDecoder>(onnx_fsdec_path, *env, *memory_info);
+        ssdecoder = std::make_unique<SSDecoder>(onnx_sdec_path, *env, *memory_info);
+        vits = std::make_unique<Vits>(onnx_model_path, *env, *memory_info);
+    }
 
     const std::string lang { "en" };
     const std::string text_split_method { "cut4" };

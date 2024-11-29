@@ -110,7 +110,8 @@ target_link_libraries(tts_cpp
 target_include_directories(tts_cpp PRIVATE ${cnpy_SOURCE_DIR})
 
 # Library
-add_library(  sealtts SHARED
+add_library(sealtts
+            SHARED
               tts_engine.cpp
               vits.cpp
               encoder.cpp
@@ -128,7 +129,6 @@ target_link_libraries(sealtts
                     PRIVATE
                         cnpy
                         onnxruntime
-                        SndFile::sndfile
                         nlohmann_json::nlohmann_json
                     )
 
