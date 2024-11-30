@@ -51,6 +51,9 @@ std::string tensor_type_conv(ONNXTensorElementDataType type) {
  * @param session The ONNX session
  */
 void display_model_info(Ort::Session& session) {
+#ifndef VERBOSE
+    return;
+#endif
     // print input and output names
     std::cout << "Number of inputs: " << session.GetInputCount() << std::endl;
     std::cout << "Number of outputs: " << session.GetOutputCount() << std::endl;
@@ -103,6 +106,9 @@ void display_model_info(Ort::Session& session) {
  * @param dims The  dimensions
  */
 void print_dims(const std::string& name, const std::vector<int64_t>& dims) {
+#ifndef VERBOSE
+    return;
+#endif
     std::cout << name << " dims: ";
     for (int j = 0; j < dims.size(); j++) {
         std::cout << dims[j] << " ";
