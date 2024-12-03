@@ -1,3 +1,4 @@
+import time
 import onnxruntime as ort
 import numpy as np
 import soundfile as sf 
@@ -51,7 +52,7 @@ def run_t2s_onnx_model(onnx_model_paths, ref_seq, text_seq, ref_bert, text_bert,
     print(f"text_bert type: {text_bert_numpy.dtype}, shape: {text_bert_numpy.shape}")
     print(f"ssl_content type: {ssl_content_numpy.dtype}, shape: {ssl_content_numpy.shape}")
 
-
+    time_begin = time.time()
     encoder_outputs = encoder_session.run(encoder_output_names, encoder_inputs)
     x, prompts = encoder_outputs
     print(f"Encoder output shapes: x = {x.shape}, prompts = {prompts.shape}")
@@ -98,6 +99,8 @@ def run_t2s_onnx_model(onnx_model_paths, ref_seq, text_seq, ref_bert, text_bert,
     y_sliced = y[:, -idx:]  # Perform slicing
     y_unsqueezed = np.expand_dims(y_sliced, axis=0)  
     print(f"Final y shape after stopping and slicing: {y_unsqueezed.shape}")
+    time_end = time.time()
+    print(f"*** Time taken for inference: {time_end - time_begin:.2f} seconds")
     
     return y_unsqueezed
 
@@ -141,7 +144,7 @@ if __name__ == "__main__":
     onnx_model_path = f"onnx/{project_name}/{project_name}_vits.onnx"
 
     # Step 1: Use the TextPreprocessor class to get text_seq
-    text = "just the two of us, we can make it if we try"
+    text = "The quick brown fox jumps over the lazy dog."
     text_preprocessor = TextPreprocessor()
     processed_text = text_preprocessor.preprocess(text, "en", "cut4")
     # Convert the processed result into numpy format for text_seq

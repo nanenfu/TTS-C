@@ -12,7 +12,9 @@
  * Load the SSL content from the ssl_content.npy file
  */
 std::tuple<std::vector<float>, std::vector<int64_t>> load_ssl_content(const std::string& ssl_content_path) {
+#ifdef VERBOSE
     std::cout << "Loading SSL content from " << ssl_content_path << std::endl;
+#endif
     const cnpy::NpyArray ssl_content_numpy { cnpy::npy_load(ssl_content_path) };
     assert(ssl_content_numpy.word_size == sizeof(float));
 
@@ -23,7 +25,9 @@ std::tuple<std::vector<float>, std::vector<int64_t>> load_ssl_content(const std:
 
     // transpose if Fortran order
     if (ssl_content_numpy.fortran_order) {
+#ifdef VERBOSE
         std::cout << ssl_content_path << " is in Fortran order" << std::endl;
+#endif
 
         // Transpose the matrix
         std::vector<float> ssl_content_transposed(ssl_content.size());

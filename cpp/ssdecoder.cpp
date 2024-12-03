@@ -13,12 +13,17 @@
 SSDecoder::SSDecoder(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryInfo& _memory_info)
                     : memory_info(_memory_info)
 {
+#ifdef VERBOSE
     std::cout << "Loading ONNX models from " << onnx_model_path << std::endl;
+#endif
     Ort::SessionOptions session_options;
+
     session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), session_options);
 
+#ifdef VERBOSE
     std::cout << "SSDecoder model info: " << std::endl;
     display_model_info(*session);
+#endif
 }
 
 std::vector<int64_t> SSDecoder::run(FSDecoderResult& fsdecoder_result, int early_stop_num, int prefix_len) const
@@ -50,7 +55,9 @@ std::vector<int64_t> SSDecoder::run(FSDecoderResult& fsdecoder_result, int early
     std::vector<const char*> input_names {"iy", "ik", "iv", "iy_emb", "ix_example"};
     std::vector<const char*> output_names { "y", "k", "v", "y_emb", "logits", "samples" };
 
+#ifdef VERBOSE
     std::cout << "Running second stage decoder..." << std::endl;
+#endif
 
     int idx = 1;
     for (; idx < 1500; ++idx) {
@@ -117,7 +124,9 @@ std::vector<int64_t> SSDecoder::run(FSDecoderResult& fsdecoder_result, int early
         samples = std::vector<int32_t>(samples_data, samples_data + samples_data_size);
 
         if (samples[0] == 1024) {
+#ifdef VERBOSE
             std::cout << "samples[0] == 1024" << std::endl;
+#endif
             break;
         }
 
@@ -129,18 +138,25 @@ std::vector<int64_t> SSDecoder::run(FSDecoderResult& fsdecoder_result, int early
         auto max_it = std::max_element(logits.begin(), logits.end());
         int max_idx = std::distance(logits.begin(), max_it);
         if (max_idx == 1024) {
+#ifdef VERBOSE
             std::cout << "np.argmax(logits, axis=-1)[0] == 1024" << std::endl;
+#endif
             break;
         }
     }
 
+#ifdef VERBOSE
     std::cout << "stop at " << idx << std::endl;
     std::cout << "Second stage decoder run successfully" << std::endl;
+#endif
 
     // Perform slicing
     iy[iy.size() - 1] = 0;
     std::vector<int64_t> y_sliced(iy.begin() + iy.size() - idx, iy.end());
+
+#ifdef VERBOSE
     std::cout << "Final y shape after stopping and slicing: " << y_sliced.size() << std::endl;
+#endif
 
     return y_sliced;
 }

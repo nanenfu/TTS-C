@@ -63,6 +63,7 @@ add_executable(tests
                 tests/test_encoder.cpp
                 tests/test_ssl_content.cpp
                 tests/test_g2p.cpp
+                tests/test_tts_engine.cpp
 )
 
 target_link_libraries(tests

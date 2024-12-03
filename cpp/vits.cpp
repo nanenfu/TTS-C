@@ -12,12 +12,17 @@
 Vits::Vits(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryInfo& _memory_info)
             : memory_info(_memory_info)
 {
+#ifdef VERBOSE
     std::cout << "Loading ONNX models from " << onnx_model_path << std::endl;
-    Ort::SessionOptions encoder_session_options;
-    session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), encoder_session_options);
+#endif
+    Ort::SessionOptions session_options;
 
+    session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), session_options);
+
+#ifdef VERBOSE
     std::cout << "VITS model info: " << std::endl;
     display_model_info(*session);
+#endif
 }
 
 // Adapted from the Enfu's code

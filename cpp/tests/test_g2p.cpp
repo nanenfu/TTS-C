@@ -6,8 +6,8 @@
 G2P g2p("g2p_en_dict.json");
 
 TEST_CASE("g2p should split sentence into phone", "[NLP]") {
-    std::vector<std::string> phones = g2p.translate("H", "en");
+    std::vector<std::string> phones = g2p.translate("D", "en");
 
-    REQUIRE(phones[0] == "HH");
-    REQUIRE(phones.size() == 12);
+    REQUIRE(phones[0] == "D");
+    REQUIRE(phones.size() == 2);
 }

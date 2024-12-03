@@ -19,12 +19,17 @@
 
 Encoder::Encoder(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryInfo& _memory_info)
                     : memory_info(_memory_info) {
+#ifdef VERBOSE
     std::cout << "Loading ONNX models from " << onnx_model_path << std::endl;
+#endif
     Ort::SessionOptions session_options;
+
     session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), session_options);
 
+#ifdef VERBOSE
     std::cout << "Encoder model info: " << std::endl;
     display_model_info(*session);
+#endif
 }
 
 EncoderResult Encoder::run(std::vector<int64_t> ref_seq,
@@ -92,11 +97,15 @@ EncoderResult Encoder::run(std::vector<int64_t> ref_seq,
 
     std::vector<const char*> output_names { "x", "prompts" };
 
+#ifdef VERBOSE
     std::cout << "Running encoder..." << std::endl;
+#endif
     auto outputs = session->Run(Ort::RunOptions{nullptr},
                                         input_names.data(), inputs.data(), inputs.size(),
                                         output_names.data(), output_names.size());
+#ifdef VERBOSE
     std::cout << "Encoder run successfully" << std::endl;
+#endif
 
     EncoderResult encoder_result;
 

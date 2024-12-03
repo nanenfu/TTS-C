@@ -20,12 +20,17 @@
 
 FSDecoder::FSDecoder(const std::string& onnx_model_path, Ort::Env& env, Ort::MemoryInfo& _memory_info)
                     : memory_info(_memory_info) {
+#ifdef VERBOSE
     std::cout << "Loading ONNX models from " << onnx_model_path << std::endl;
+#endif
     Ort::SessionOptions session_options;
+
     session = std::make_unique<Ort::Session>(env, onnx_model_path.c_str(), session_options);
 
-    std::cout << "Encoder model info: " << std::endl;
+#ifdef VERBOSE
+    std::cout << "FSDecoder model info: " << std::endl;
     display_model_info(*session);
+#endif
 }
 
 FSDecoderResult FSDecoder::run(EncoderResult& encoder_result) const {
@@ -49,11 +54,15 @@ FSDecoderResult FSDecoder::run(EncoderResult& encoder_result) const {
 
     std::vector<const char*> output_names { "y", "k", "v", "y_emb", "x_example" };
 
+#ifdef VERBOSE
     std::cout << "Running first stage decoder..." << std::endl;
+#endif
     auto outputs = session->Run(Ort::RunOptions{nullptr},
                                         input_names.data(), inputs.data(), inputs.size(),
                                         output_names.data(), output_names.size());
+#ifdef VERBOSE
     std::cout << "First stage decoder run successfully" << std::endl;
+#endif
 
     FSDecoderResult fsdecoder_result;
 

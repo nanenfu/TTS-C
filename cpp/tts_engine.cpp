@@ -53,21 +53,30 @@ TTSEngine::TTSEngine(const std::string _onnx_encoder_path,
     vits = std::make_unique<Vits>(onnx_model_path, *env, *memory_info);
 }
 
-std::vector<float> TTSEngine::generate_audio(const std::string text, bool reset_model) {
-    std::cout << "Generating audio for the following text: " << text << std::endl;
+void TTSEngine::reset_model() {
+#ifdef VERBOSE
+    std::cout << "Resetting model..." << std::endl;
+#endif
+    fsdecoder = std::make_unique<FSDecoder>(onnx_fsdec_path, *env, *memory_info);
+    ssdecoder = std::make_unique<SSDecoder>(onnx_sdec_path, *env, *memory_info);
+    vits = std::make_unique<Vits>(onnx_model_path, *env, *memory_info);
+}
 
-    if (reset_model) {
-        fsdecoder = std::make_unique<FSDecoder>(onnx_fsdec_path, *env, *memory_info);
-        ssdecoder = std::make_unique<SSDecoder>(onnx_sdec_path, *env, *memory_info);
-        vits = std::make_unique<Vits>(onnx_model_path, *env, *memory_info);
-    }
+std::vector<float> TTSEngine::generate_audio(const std::string text) {
+#ifdef VERBOSE
+    std::cout << "Generating audio for the following text: " << text << std::endl;
+#endif
 
     const std::string lang { "en" };
     const std::string text_split_method { "cut4" };
 
+#ifdef VERBOSE
     std::cout << "Preprocessing text..." << std::endl;
+#endif
     std::vector<int64_t> text_seq { preprocessor->preprocess(text, lang, text_split_method) };
+#ifdef VERBOSE
     std::cout << "Preprocessing finished..." << std::endl;
+#endif
 
     const std::vector<int64_t> ref_seq {
             10, 64, 26, 75, 42, 1, 64, 68, 1, 64, 68, 1, 55, 80, 75, 68, 61, 42,
@@ -80,34 +89,47 @@ std::vector<float> TTSEngine::generate_audio(const std::string text, bool reset_
     const std::vector<std::vector<float>> ref_bert(ref_seq.size(), std::vector<float>(1024, 0.0f));
     const std::vector<std::vector<float>> text_bert(text_seq.size(), std::vector<float>(1024, 0.0f));
 
+#ifdef VERBOSE
     std::cout << "Run encoder..." << std::endl;
+#endif
     EncoderResult encoder_result {
         encoder->run(ref_seq, text_seq, ref_bert, text_bert, ssl_conent, ssl_content_shape)
     };
+#ifdef VERBOSE
     std::cout << "Finished." << std::endl;
+#endif
 
+#ifdef VERBOSE
     std::cout << "Run decoder..." << std::endl;
+#endif
     FSDecoderResult fsdecoder_result {
         fsdecoder->run(encoder_result)
     };
+#ifdef VERBOSE
     std::cout << "Finished." << std::endl;
+#endif
 
     const int early_stop_num = 2700;
     const int prefix_len = encoder_result.prompts_shape[1];
 
+#ifdef VERBOSE
     std::cout << "Run ssdecoder..." << std::endl;
+#endif
     const std::vector<int64_t> pred_semantic {
         ssdecoder->run(fsdecoder_result, early_stop_num, prefix_len)
     };
+#ifdef VERBOSE
     std::cout << "Finished." << std::endl;
 
     std::cout << "Run vits..." << std::endl;
+#endif
     const std::vector<float> audio_output {
         vits->run(text_seq, pred_semantic)
     };
+#ifdef VERBOSE
     std::cout << "Finished." << std::endl;
 
     std::cout << "Audio generated!" << std::endl;
-
+#endif
     return audio_output;
 }

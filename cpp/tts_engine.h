@@ -22,7 +22,8 @@ public:
                 const std::string ssl_content_path,
                 const std::string g2p_dict_file);
 
-    std::vector<float> generate_audio(const std::string text, bool reset_model = false);
+    void reset_model();
+    std::vector<float> generate_audio(const std::string text);
 
 private:
     std::string onnx_encoder_path;
