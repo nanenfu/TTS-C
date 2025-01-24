@@ -15,8 +15,13 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-
-link_directories(${ONNXRUNTIME_DIR}/build/MacOS/${CMAKE_BUILD_TYPE})
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin") # macOS
+    link_directories(${ONNXRUNTIME_DIR}/build/MacOS/${CMAKE_BUILD_TYPE})
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    link_directories(${ONNXRUNTIME_DIR}/build/Linux/RelWithDebInfo)
+else()
+    message(FATAL_ERROR "Unsupported operating system: ${CMAKE_SYSTEM_NAME}")
+endif()
 
 include(FetchContent)
 
@@ -41,8 +46,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
-# Find packages
-find_package(SndFile REQUIRED)
+FetchContent_Declare(
+  libsndfile
+  GIT_REPOSITORY https://github.com/libsndfile/libsndfile
+  GIT_TAG        1.2.2)
+FetchContent_MakeAvailable(libsndfile)
 
 # Tests
 add_executable(tests

@@ -4,7 +4,10 @@
 #include <vector>
 #include <memory>
 #include <onnxruntime/core/session/onnxruntime_cxx_api.h>
+
+#ifdef __APPLE__
 #include <swift/bridging>
+#endif
 
 #include "text_preprocessor.h"
 #include "encoder.h"
@@ -42,4 +45,8 @@ private:
 
     std::unique_ptr<Ort::Env> env;
     std::unique_ptr<Ort::MemoryInfo> memory_info;
+#ifdef __APPLE__
 } SWIFT_NONCOPYABLE;
+#else
+};
+#endif

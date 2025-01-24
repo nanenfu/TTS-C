@@ -4,6 +4,7 @@
 #include <codecvt>
 #include <locale>
 #include <vector>
+#include <algorithm>
 
 #include "string_utils.h"
 
