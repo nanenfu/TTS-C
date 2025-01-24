@@ -42,8 +42,12 @@ make
 
 3. Run tests
 ```bash
-cd build/RelWithDebInfo
 ctest # or ./tests -V for verbose output
+```
+
+4. Run benchmarks
+```bash
+./tests --benchmark-samples 5
 ```
 
 ## Linter
